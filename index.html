@@ -1,0 +1,209 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="fightheyyy 的技术博客，记录 AI Agent、记忆系统与工程实践。" />
+    <title>fightheyyy | Tech Blog</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="typing-backdrop" aria-hidden="true">
+      <span id="typing-backdrop-text"></span><span class="typing-backdrop-cursor">_</span>
+    </div>
+
+    <main class="page">
+      <header class="header">
+        <a class="name" href="#top">fightheyyy</a>
+        <nav class="nav" aria-label="页面导航">
+          <a href="#top">Overview</a>
+          <a href="#notes">Notes</a>
+          <a href="#projects">Projects</a>
+          <a href="#stack">Stack</a>
+        </nav>
+      </header>
+
+      <div class="profile-layout">
+        <aside class="profile-sidebar" aria-label="Profile">
+          <img class="avatar" src="assets/avatar.png" alt="fightheyyy avatar" />
+          <h1>fightheyyy</h1>
+          <p class="handle">@fightheyyy</p>
+          <p class="bio">AI Agent / Runtime / Memory System / Engineering Notes</p>
+          <div class="profile-actions">
+            <a href="https://github.com/fightheyyy" target="_blank" rel="noreferrer">GitHub</a>
+          </div>
+          <dl class="profile-meta">
+            <div>
+              <dt>Focus</dt>
+              <dd>Agent Runtime</dd>
+            </div>
+            <div>
+              <dt>Writing</dt>
+              <dd>AI infra notes</dd>
+            </div>
+            <div>
+              <dt>Style</dt>
+              <dd>black / white</dd>
+            </div>
+          </dl>
+          <div class="mini-stack">
+            <span>TypeScript</span>
+            <span>Python</span>
+            <span>Node.js</span>
+            <span>Electron</span>
+          </div>
+        </aside>
+
+        <div class="profile-main">
+          <section class="readme-card" id="top">
+            <div class="readme-title">
+              <span>README.md</span>
+            </div>
+            <h2>Hi, I'm fightheyyy.</h2>
+            <p>
+              我正在围绕 XiaoBa-CLI 这个 Agent Runtime，尝试构建一套更开放的 Agent infrastructure。
+              它不只是一个命令行工具，而是一个可以承载多角色协作、工具调用、skills 扩展、长期记忆和多端接入的基础层。
+            </p>
+            <p>
+              我希望围绕这个 Runtime 打造一个 Agent 宇宙：不同 Agent 可以拥有独立上下文和执行生命周期，
+              可以通过 subagent 与 Agent2Agent 机制完成复杂任务拆解，也可以接入飞书、微信、桌面端、
+              Web 服务甚至硬件设备，成为更自然的数字伙伴。
+            </p>
+            <p>
+              接下来我会继续探索 XiaoBa-CLI 与硬件结合的可能性，比如开源桌宠、实体陪伴设备、
+              本地自动化控制和多模态交互，让 Agent 不只停留在聊天窗口里，而是能真正进入日常工作流和物理空间。
+            </p>
+            <ul class="readme-list">
+              <li>开源 Agent infra：runtime、session、tools、skills、roles、permissions。</li>
+              <li>Multi-agent 协作：subagent 调度、Agent2Agent 通信、异步任务和结果回注。</li>
+              <li>Agent memory：长期记忆、知识图谱、向量检索、多跳推理和记忆代谢。</li>
+              <li>Agent x Hardware：桌宠、实体设备、本地自动化和多模态交互。</li>
+              <li>工程化实践：模型降级、限流重试、上下文压缩、日志记录和回归测试。</li>
+            </ul>
+          </section>
+
+          <section class="section" id="projects">
+            <div class="section-title">
+              <h2>Pinned repositories</h2>
+              <p>三个主要项目入口。</p>
+            </div>
+
+            <div class="projects pinned-grid">
+              <article class="project project-featured">
+                <canvas id="cat-orb" aria-hidden="true"></canvas>
+                <div class="project-content">
+                  <div class="project-head">
+                    <div>
+                      <p class="project-time">Agent Runtime</p>
+                      <h3>XiaoBa-CLI</h3>
+                    </div>
+                    <a href="https://github.com/buildsense-ai/XiaoBa-CLI" target="_blank" rel="noreferrer">GitHub</a>
+                  </div>
+                  <p class="muted">TypeScript / Python / Electron / Node.js</p>
+                  <ul>
+                    <li>Agent Runtime、subagent 调度、role 机制。</li>
+                    <li>飞书、微信、CatsCompany 多入口会话管理。</li>
+                    <li>Markdown + frontmatter Skill 系统。</li>
+                    <li>Electron 桌面端与机器人服务 Dashboard。</li>
+                  </ul>
+                </div>
+              </article>
+
+              <article class="project project-memory">
+                <canvas id="mem-metaballs" class="metaballs-canvas" aria-hidden="true"></canvas>
+                <div class="project-content">
+                  <div class="project-head">
+                    <div>
+                      <p class="project-time">Memory System</p>
+                      <h3>GauzMem</h3>
+                    </div>
+                    <a href="https://github.com/fightheyyy/Mem_System" target="_blank" rel="noreferrer">GitHub</a>
+                  </div>
+                  <p class="muted">Python / Neo4j / Qdrant / MySQL / DashScope</p>
+                  <ul>
+                    <li>短期记忆与长期知识图谱/向量索引。</li>
+                    <li>Facts 图、Topics 图与主题聚类。</li>
+                    <li>语义检索、图谱多跳扩展、时序上下文扩展。</li>
+                  </ul>
+                </div>
+              </article>
+
+              <article class="project project-writing">
+                <canvas id="writing-hyperspeed" class="hyperspeed-canvas" aria-hidden="true"></canvas>
+                <div class="project-content">
+                  <div class="project-head">
+                    <div>
+                      <p class="project-time">Writing Agent</p>
+                      <h3>Vibe Writing Platform</h3>
+                    </div>
+                    <a href="https://github.com/buildsense-ai/GauzDocument-Agent" target="_blank" rel="noreferrer">GitHub</a>
+                  </div>
+                  <p class="muted">Python / Monaco Editor / MinerU / RAG / OpenRouter</p>
+                  <ul>
+                    <li>Plan and Execute 多 Agent 写作工作流。</li>
+                    <li>Review Agent、MinerU、RAG 与内容可追溯。</li>
+                    <li>类 Cursor 的文档编辑与 AI 改写体验。</li>
+                  </ul>
+                </div>
+              </article>
+            </div>
+          </section>
+
+          <section class="section" id="notes">
+            <div class="section-title">
+              <h2>Latest notes</h2>
+              <p>准备沉淀的技术文章方向。</p>
+            </div>
+            <div class="note-list">
+              <article class="note-row">
+                <span>01</span>
+                <div>
+                  <h3>Agent Runtime</h3>
+                  <p>subagent 调度、role 机制、工具调用、会话隔离与异步任务生命周期。</p>
+                </div>
+              </article>
+              <article class="note-row">
+                <span>02</span>
+                <div>
+                  <h3>Memory System</h3>
+                  <p>长期记忆、知识图谱、向量检索、多跳扩展和记忆代谢机制。</p>
+                </div>
+              </article>
+              <article class="note-row">
+                <span>03</span>
+                <div>
+                  <h3>Writing Agent</h3>
+                  <p>Plan and Execute、多 Agent 协作、RAG、文档编辑器和内容可追溯。</p>
+                </div>
+              </article>
+            </div>
+          </section>
+
+          <section class="section" id="stack">
+            <div class="section-title">
+              <h2>Tech stack</h2>
+              <p>常写、常用、常折腾。</p>
+            </div>
+            <div class="tags">
+              <span>AI Agent</span>
+              <span>TypeScript</span>
+              <span>Python</span>
+              <span>Node.js</span>
+              <span>Electron</span>
+              <span>RAG</span>
+              <span>Knowledge Graph</span>
+              <span>WebSocket</span>
+            </div>
+          </section>
+        </div>
+      </div>
+
+      <footer class="footer">
+        <span>fightheyyy.github.io</span>
+        <span>Black / white technical notes</span>
+      </footer>
+    </main>
+
+    <script src="script.js"></script>
+  </body>
+</html>
