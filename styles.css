@@ -466,17 +466,22 @@ li::marker {
 }
 
 @media (max-width: 620px) {
+  body {
+    line-height: 1.68;
+  }
+
   .typing-backdrop {
     align-items: flex-end;
     justify-content: flex-start;
     padding: 0.9rem;
-    color: rgba(255, 255, 255, 0.22);
-    font-size: clamp(3.2rem, 17vw, 5.6rem);
+    color: rgba(255, 255, 255, 0.14);
+    font-size: clamp(2.8rem, 15vw, 4.8rem);
     text-align: left;
   }
 
   .page {
-    width: min(100% - 1.2rem, 760px);
+    width: min(100% - 1rem, 760px);
+    padding-top: 6.7rem;
   }
 
   .header,
@@ -487,6 +492,19 @@ li::marker {
 
   .nav {
     gap: 0.75rem;
+  }
+
+  .header {
+    width: calc(100% - 1rem);
+    padding: 0.7rem 0;
+  }
+
+  .name {
+    font-size: 0.95rem;
+  }
+
+  .nav a {
+    font-size: 0.84rem;
   }
 
   .hero {
@@ -801,13 +819,57 @@ li::marker {
   }
 
   .profile-sidebar {
-    display: block;
+    display: grid;
+    align-items: center;
+    grid-template-columns: auto minmax(0, 1fr);
+    gap: 0.8rem 1rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--line);
   }
 
   .avatar {
-    width: 6.4rem;
-    height: 6.4rem;
-    font-size: 3rem;
+    grid-row: 1 / span 3;
+    width: 5.4rem;
+    height: 5.4rem;
+    margin-bottom: 0;
+  }
+
+  .profile-sidebar h1,
+  .handle,
+  .bio {
+    grid-column: 2;
+  }
+
+  .profile-sidebar h1 {
+    font-size: 1.35rem;
+  }
+
+  .handle,
+  .bio {
+    margin-bottom: 0;
+  }
+
+  .bio {
+    font-size: 0.92rem;
+  }
+
+  .profile-actions,
+  .profile-meta,
+  .mini-stack {
+    grid-column: 1 / -1;
+  }
+
+  .profile-actions {
+    margin-bottom: 0.4rem;
+  }
+
+  .profile-meta {
+    margin-bottom: 0.6rem;
+    padding: 0.75rem 0;
+  }
+
+  .profile-meta div {
+    font-size: 0.9rem;
   }
 
   .readme-card h2,
@@ -815,5 +877,56 @@ li::marker {
   .readme-list {
     margin-right: 1rem;
     margin-left: 1rem;
+  }
+
+  .readme-card h2 {
+    font-size: 1.7rem;
+  }
+
+  .readme-card p,
+  .readme-list,
+  .section p,
+  ul {
+    font-size: 0.94rem;
+  }
+
+  .section {
+    padding: 1rem;
+  }
+
+  .section-title {
+    gap: 0.25rem;
+  }
+
+  .project {
+    min-height: 15rem;
+    padding: 1rem;
+  }
+
+  .project-featured,
+  .project-memory,
+  .project-writing {
+    min-height: 16.5rem;
+  }
+
+  .project-head {
+    gap: 0.4rem;
+  }
+
+  .project-head a {
+    font-size: 0.86rem;
+  }
+
+  .metaballs-canvas,
+  .hyperspeed-canvas {
+    opacity: 0.42;
+  }
+
+  #cat-orb {
+    opacity: 0.58;
+  }
+
+  .note-row {
+    grid-template-columns: 2rem minmax(0, 1fr);
   }
 }
