@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="fightheyyy 的技术博客，记录 AI Agent、记忆系统与工程实践。" />
+    <meta name="description" content="fightheyyy 的技术博客，记录 Agent harness、记忆系统与工程实践。" />
     <title>fightheyyy | Tech Blog</title>
     <link rel="icon" type="image/png" href="assets/favicon.png" />
     <link rel="stylesheet" href="styles.css" />
@@ -29,18 +29,18 @@
           <img class="avatar" src="assets/avatar.png" alt="fightheyyy avatar" />
           <h1>fightheyyy</h1>
           <p class="handle">@fightheyyy</p>
-          <p class="bio">AI Agent / Runtime / Memory System / Engineering Notes</p>
+          <p class="bio">AI Agent / Runtime Harness / Memory System / Engineering Notes</p>
           <div class="profile-actions">
             <a href="https://github.com/fightheyyy" target="_blank" rel="noreferrer">GitHub</a>
           </div>
           <dl class="profile-meta">
             <div>
               <dt>Focus</dt>
-              <dd>Agent Runtime</dd>
+              <dd>Agent Harness</dd>
             </div>
             <div>
               <dt>Writing</dt>
-              <dd>AI infra notes</dd>
+              <dd>Harness notes</dd>
             </div>
             <div>
               <dt>Style</dt>
@@ -62,11 +62,12 @@
             </div>
             <h2>Hi, I'm fightheyyy.</h2>
             <p>
-              我正在围绕 XiaoBa-CLI 这个 Agent Runtime，尝试构建一套更开放的 Agent infrastructure。
-              它不只是一个命令行工具，而是一个可以承载多角色协作、工具调用、skills 扩展、长期记忆和多端接入的基础层。
+              我正在围绕 XiaoBa-CLI 这个 Agent Runtime Harness，尝试构建一套让 Agent 更容易运行、编排、
+              接工具、接角色、接记忆，并进入真实工作流的开发环境。
+              它不只是一个命令行工具，而是一个可以承载多角色协作、工具调用、skills 扩展、长期记忆和多端接入的 harness。
             </p>
             <p>
-              我希望围绕这个 Runtime 打造一个 Agent 宇宙：不同 Agent 可以拥有独立上下文和执行生命周期，
+              我希望围绕这个 harness 打造一个 Agent 宇宙：不同 Agent 可以拥有独立上下文和执行生命周期，
               可以通过 subagent 与 Agent2Agent 机制完成复杂任务拆解，也可以接入飞书、微信、桌面端、
               Web 服务甚至硬件设备，成为更自然的数字伙伴。
             </p>
@@ -75,7 +76,7 @@
               本地自动化控制和多模态交互，让 Agent 不只停留在聊天窗口里，而是能真正进入日常工作流和物理空间。
             </p>
             <ul class="readme-list">
-              <li>开源 Agent infra：runtime、session、tools、skills、roles、permissions。</li>
+              <li>Agent harness：runtime、session、tools、skills、roles、permissions。</li>
               <li>Multi-agent 协作：subagent 调度、Agent2Agent 通信、异步任务和结果回注。</li>
               <li>Agent memory：长期记忆、知识图谱、向量检索、多跳推理和记忆代谢。</li>
               <li>Agent x Hardware：桌宠、实体设备、本地自动化和多模态交互。</li>
@@ -95,14 +96,14 @@
                 <div class="project-content">
                   <div class="project-head">
                     <div>
-                      <p class="project-time">Agent Runtime</p>
+                      <p class="project-time">Agent Harness</p>
                       <h3>XiaoBa-CLI</h3>
                     </div>
                     <a href="https://github.com/buildsense-ai/XiaoBa-CLI" target="_blank" rel="noreferrer">GitHub</a>
                   </div>
                   <p class="muted">TypeScript / Python / Electron / Node.js</p>
                   <ul>
-                    <li>Agent Runtime、subagent 调度、role 机制。</li>
+                    <li>Agent harness、subagent 调度、role 机制。</li>
                     <li>飞书、微信、CatsCompany 多入口会话管理。</li>
                     <li>Markdown + frontmatter Skill 系统。</li>
                     <li>Electron 桌面端与机器人服务 Dashboard。</li>
@@ -159,7 +160,7 @@
               <article class="note-row">
                 <span>01</span>
                 <div>
-                  <h3>Agent Runtime</h3>
+                  <h3>Agent Harness</h3>
                   <p>subagent 调度、role 机制、工具调用、会话隔离与异步任务生命周期。</p>
                 </div>
               </article>
@@ -187,6 +188,7 @@
             </div>
             <div class="tags">
               <span>AI Agent</span>
+              <span>Agent Harness</span>
               <span>TypeScript</span>
               <span>Python</span>
               <span>Node.js</span>

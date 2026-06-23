@@ -1,6 +1,6 @@
 # Fightheyyy.github.io
 
-fightheyyy 的技术博客首页，布局参考 GitHub Profile，用于记录 AI Agent、记忆系统、写作平台和工程实践。首页使用原生 JS 打字机背景，`XiaoBa-CLI` 项目栏使用从 `XiaoBa-OS` 前端移植的黑金 WebGL 猫头动态背景，`GauzMem` 使用原生 WebGL2 Metaballs 背景，`Vibe Writing Platform` 使用轻量 Canvas Hyperspeed 光轨背景。项目是纯静态站点，可以直接用 GitHub Pages 托管。
+fightheyyy 的技术博客首页，布局参考 GitHub Profile，用于记录 Agent harness、记忆系统、写作平台和工程实践。首页使用原生 JS 打字机背景，`XiaoBa-CLI` 项目栏使用从 `XiaoBa-OS` 前端移植的黑金 WebGL 猫头动态背景，`GauzMem` 使用原生 WebGL2 Metaballs 背景，`Vibe Writing Platform` 使用轻量 Canvas Hyperspeed 光轨背景。项目是纯静态站点，可以直接用 GitHub Pages 托管。
 
 ## 文件
 
