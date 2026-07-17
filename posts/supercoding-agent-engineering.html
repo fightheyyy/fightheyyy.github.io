@@ -1,0 +1,286 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="两个月累计使用 Codex 130 亿 Token 后，我把架构设计、并行实现和循环审查总结为 SuperDev、SuperGoal 和 SuperReview 三个开发 Skill。"
+    />
+    <meta property="og:type" content="article" />
+    <meta property="og:title" content="两个月用掉 130 亿 Token 后，我总结出 3 个 Codex 开发 Skill" />
+    <meta
+      property="og:description"
+      content="13B Token 不是成绩单，而是一次高强度工程实验。SuperDev 对齐架构，SuperGoal 调度实现，SuperReview 循环验收。"
+    />
+    <meta property="og:image" content="https://fightheyyy.github.io/assets/posts/supercoding/hero.png" />
+    <meta property="article:published_time" content="2026-07-16" />
+    <title>两个月用掉 130 亿 Token 后，我总结出 3 个 Codex 开发 Skill</title>
+    <link rel="canonical" href="https://fightheyyy.github.io/posts/supercoding-agent-engineering.html" />
+    <link rel="icon" type="image/png" href="../assets/favicon.png" />
+    <link
+      rel="preload"
+      href="../assets/fonts/syne-latin-wght-normal.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin
+    />
+    <link rel="stylesheet" href="../styles.css?v=20260717-6" />
+    <link rel="stylesheet" href="../assets/posts/supercoding/supercoding-hero.css?v=20260717-2" />
+  </head>
+  <body class="article-page supercoding-post">
+    <header class="article-site-header supercoding-topbar">
+      <a class="name article-name-mark" href="../index.html" aria-label="Fightheyyy">
+        <span class="article-name-stem" aria-hidden="true">Fighthe</span>
+        <span class="article-name-tail" aria-hidden="true">yyy</span>
+      </a>
+      <nav class="nav" aria-label="文章导航">
+        <a href="../index.html#blog">Tech Blog</a>
+        <a href="https://github.com/fightheyyy/SuperCoding" target="_blank" rel="noreferrer">GitHub</a>
+      </nav>
+    </header>
+
+    <main>
+      <section class="supercoding-hero" id="supercodingHero" aria-labelledby="supercodingHeroTitle">
+        <canvas id="supercodingCanvas" aria-hidden="true"></canvas>
+        <div class="supercoding-hero-shade" aria-hidden="true"></div>
+
+        <div class="supercoding-hit-layer" aria-label="SuperCoding 三件交互装置">
+          <button class="supercoding-hit goal-hit" type="button" data-instrument="goal" aria-label="旋转并锁定 SuperGoal 瞄准环">
+            <span class="supercoding-instrument-label"><strong>SuperGoal</strong><small>拖动校准，点击锁定</small></span>
+          </button>
+          <button class="supercoding-hit dev-hit" type="button" data-instrument="dev" aria-label="旋转并构建 SuperDev 构建体">
+            <span class="supercoding-instrument-label"><strong>SuperDev</strong><small>拖动检查，点击构建</small></span>
+          </button>
+          <button class="supercoding-hit review-hit" type="button" data-instrument="review" aria-label="拖动并运行 SuperReview 扫描框">
+            <span class="supercoding-instrument-label"><strong>SuperReview</strong><small>拖动扫描，点击验收</small></span>
+          </button>
+        </div>
+
+        <div class="supercoding-hero-copy">
+          <p class="supercoding-title" id="supercodingHeroTitle">SuperCoding</p>
+          <p>代码可以越来越像黑盒，系统不能不可验证。把人的控制面上移到架构、边界、验收和证据。</p>
+          <div class="supercoding-readout" aria-live="polite">
+            <span>CONTROL PLANE</span>
+            <b id="supercodingStatus">READY · DRAG OR CLICK</b>
+          </div>
+        </div>
+      </section>
+
+      <div class="article-shell supercoding-article-shell">
+        <article>
+          <header class="article-header">
+            <p class="article-kicker">Agent Engineering / SuperCoding</p>
+            <h1 aria-label="两个月用掉 130 亿 Token 后，我总结出 3 个 Codex 开发 Skill">
+              <span>两个月用掉 130 亿 Token 后</span>
+              <span>我总结出 3 个 Codex 开发 Skill</span>
+            </h1>
+            <p class="article-deck">
+              130 亿 Token 不是成绩单，而是一次高强度工程实验。最后留下来的，是架构设计、并行实现和循环审查三个可复用 Skill。
+            </p>
+            <div class="article-meta">
+              <time datetime="2026-07-16">2026.07.16</time>
+              <span>约 12 分钟阅读</span>
+            </div>
+          </header>
+
+          <div class="article-content">
+            <p class="article-lead">
+              过去两个月，我在 Codex 里累计消耗了 13B Token。单次峰值 1.1B，最长任务 12 小时 26 分。最直接的感受不是模型越来越会写，而是旧的开发组织方式开始失效：Agent 的实现速度已经快到人无法继续把逐行阅读当成唯一控制方式。
+            </p>
+
+            <figure class="article-figure supercoding-usage-figure">
+              <div class="article-figure-scroll" tabindex="0" aria-label="可横向滚动的 Codex Token 使用记录">
+                <a
+                  href="../assets/posts/supercoding/codex-token-activity.png"
+                  target="_blank"
+                  rel="noreferrer"
+                  aria-label="在新窗口查看完整尺寸的 Codex Token 使用记录"
+                >
+                  <img
+                    src="../assets/posts/supercoding/codex-token-activity.png"
+                    alt="Codex 使用记录截图，显示累计 13B Token、峰值 1.1B Token、最长任务 12 小时 26 分，以及连续使用 24 天"
+                    width="1698"
+                    height="630"
+                    loading="lazy"
+                    decoding="async"
+                  />
+                </a>
+              </div>
+              <figcaption>
+                截至 2026 年 7 月的 Codex 使用记录：累计 13B Token，单次峰值 1.1B，最长任务 12 小时 26 分，当前与最长连续使用均为 24 天。点击查看原图。
+              </figcaption>
+            </figure>
+
+            <p>
+              13B 不是成绩单。它只说明我足够长时间、足够高强度地撞过 Agent 开发的边界。最终沉淀下来的不是更多 Prompt，而是三个开发 Skill：SuperDev、SuperGoal 和 SuperReview。
+            </p>
+
+            <p>
+              这不是说人可以退出开发，也不是说生成代码不需要审查。变化发生在<strong>控制面</strong>：我们不再试图亲手控制每个 token，而是更早地定义系统应该长什么样，哪些边界不能越过，什么结果才算完成，以及 Agent 必须拿出什么证据。
+            </p>
+
+            <aside class="article-callout supercoding-thesis">
+              <p class="article-callout-title">代码可以越来越像黑盒，系统不能不可验证。</p>
+              <p>人需要看清的是逻辑架构、接口、状态变化、风险和验收结果。代码仍然可读，但它不再是唯一的控制界面。</p>
+            </aside>
+
+            <h2>控制面为什么必须上移</h2>
+
+            <p>
+              过去，一个开发者可以靠熟悉所有模块来维持系统一致性。Agent 把实现速度放大后，代码规模和变化频率也一起被放大。如果控制方式仍停留在 diff 的每一行，人的注意力会先成为瓶颈。
+            </p>
+
+            <p>更可扩展的方式，是在实现前把四件事说清楚：</p>
+
+            <div class="supercoding-control-plane" aria-label="Agent 开发的四个控制面">
+              <div><strong>逻辑架构</strong><span>系统当前怎样工作，目标状态怎样工作。</span></div>
+              <div><strong>边界</strong><span>哪些模块、接口、数据和非目标不能被随意改变。</span></div>
+              <div><strong>验收指标</strong><span>什么可观察结果出现后，任务才允许停止。</span></div>
+              <div><strong>证据</strong><span>测试、产物、运行状态和最终 diff 怎样证明结果成立。</span></div>
+            </div>
+
+            <p>
+              这四件事不是替代代码，而是给代码建立坐标系。Agent 可以自由选择局部实现，只要它没有偏离目标架构，也能通过约定好的验收。
+            </p>
+
+            <h2>SuperDev：开发前先把架构聊清楚</h2>
+
+            <p>
+              SuperDev 解决的是最靠前的问题：不要一收到需求就开始改文件。先让人和 Agent 对齐当前实现、目标逻辑和变化边界，再进入实现。
+            </p>
+
+            <p>
+              我选择 Mermaid，不是因为文字没有用，而是因为大段 AI 说明很容易制造一种“好像解释清楚了”的错觉。图会强迫系统把模块、输入、输出和依赖关系摆在同一个空间里。缺失的节点、错误的方向和不合理的中心化，通常一眼就能看出来。
+            </p>
+
+            <div class="supercoding-doc-contract">
+              <section>
+                <h3>SPEC.md</h3>
+                <p><strong>当前逻辑架构</strong>记录系统真实怎样运行。</p>
+                <p><strong>目标逻辑架构</strong>记录这次变化准备把系统带到哪里。</p>
+              </section>
+              <section>
+                <h3>PLAN.md</h3>
+                <p><strong>做了什么</strong>记录完成状态、下一步、风险和验证证据。</p>
+                <p>它不是会议纪要，而是目标架构与当前进度之间的差值。</p>
+              </section>
+            </div>
+
+            <pre class="article-flow supercoding-mermaid" aria-label="SuperDev 维护的架构关系"><code>Current Architecture
+        ↓ identify the gap
+Target Architecture
+        ↓ execution evidence
+PLAN.md: status / risks / verification</code></pre>
+
+            <p>
+              所以“两份文档，三件事情”是一个很轻的契约：当前架构、目标架构、已经发生的工作。它们让人不必阅读 Agent 的全部思考过程，也能知道系统在哪里、要去哪里、现在走到了哪一步。
+            </p>
+
+            <h2>SuperGoal：把目标架构拆成可并行的工作</h2>
+
+            <p>
+              架构清楚以后，SuperGoal 让 Codex 的主 Agent 把目标状态翻译成可验收的 Goal Contract，再寻找互相独立的工作切片。只要写入范围不冲突、依赖关系允许，就尽量交给多个 subagent 并行完成。
+            </p>
+
+            <div class="supercoding-lanes" aria-label="SuperGoal 并行执行结构">
+              <div class="lane-parent"><strong>Main Agent</strong><span>定义验收、拆分边界、决定合并、最终验证</span></div>
+              <div class="lane-workers">
+                <span>Discovery</span>
+                <span>Implementation A</span>
+                <span>Implementation B</span>
+                <span>Verification</span>
+              </div>
+              <div class="lane-merge"><strong>Integrate</strong><span>接受、拒绝或收窄每个结果</span></div>
+            </div>
+
+            <p>
+              这里的目标不是 spawn 得越多越好，而是<strong>尽可能安全地并行</strong>。两个 subagent 同时修改同一组核心文件，往往只会制造冲突和重复上下文。真正适合并行的是只读探索、独立模块、互不相交的实现，以及独立验证。
+            </p>
+
+            <p>
+              主 Agent 也不能退化成消息转发器。它负责目标、范围、依赖、整合和最终验收。subagent 只拥有一个有边界的子目标，完成后返回证据，而不是重新定义项目方向。
+            </p>
+
+            <h2>SuperReview：主 Agent 判断，subagent 原子修复</h2>
+
+            <p>
+              SuperReview 使用同一套分工，但把重点放在代码审查。主 Agent 先冻结 PR 或 working tree 的准确边界，亲自读完整 diff 和必要的上下文，确认哪些问题真的可复现、应该修、优先级是什么。
+            </p>
+
+            <p>
+              finding 确认后，每一个<strong>互相独立的问题</strong>都可以交给一个 repair subagent。它只允许处理一个 finding，并返回最小补丁和验证结果。如果多个问题会写同一个模块，就顺序修，不为并行而并行。
+            </p>
+
+            <div class="supercoding-review-cycle" aria-label="SuperReview 循环">
+              <span>主 Agent 完整审查</span>
+              <b>→</b>
+              <span>冻结 findings</span>
+              <b>→</b>
+              <span>原子修复</span>
+              <b>→</b>
+              <span>主 Agent 验收补丁</span>
+              <b>→</b>
+              <span>重审最终 diff</span>
+            </div>
+
+            <p>
+              循环会继续，直到审查范围内没有未解决的 actionable finding。这里不能承诺“软件从此没有 bug”，那是不诚实的。能承诺的是：每个已发现问题都有状态，每个修复都经过重新验证，最终结论对应的是一个明确、完整的变更集合。
+            </p>
+
+            <h2>为什么是瞄准环、构建体和扫描框</h2>
+
+            <p>
+              我一开始也考虑过用三个球。但球只有尺寸差异，表达不了三种职责。最后我让三个 Skill 拥有不同的工程形态。
+            </p>
+
+            <div class="supercoding-instrument-meaning">
+              <section><strong>瞄准环</strong><h3>SuperGoal</h3><p>目标不是一句固定口号。它需要不断校准边界，最后锁定可验收的结果。</p></section>
+              <section><strong>构建体</strong><h3>SuperDev</h3><p>架构由节点、依赖和约束组成。它应该能被旋转、检查，并逐步装配。</p></section>
+              <section><strong>扫描框</strong><h3>SuperReview</h3><p>审查不是凭感觉盖章。扫描线经过 diff、测试和证据，留下清楚状态。</p></section>
+            </div>
+
+            <p>
+              这三个装置表示责任，不是死板的时间顺序。新项目通常从 SuperDev 的架构讨论开始，再由 SuperGoal 组织执行；SuperReview 发现结构性问题时，也会把工作重新送回 SuperDev。它们最终形成的是一个闭环。
+            </p>
+
+            <h2>人、主 Agent 和 subagent 的新分工</h2>
+
+            <div class="supercoding-responsibility-map">
+              <section><h3>人</h3><p>决定真正想解决的问题，选择架构取舍，定义不能接受的风险。</p></section>
+              <section><h3>主 Agent</h3><p>维护控制面，拆分任务，判断 findings，整合结果，执行最终验收。</p></section>
+              <section><h3>subagent</h3><p>在明确边界内探索、实现或修复，并返回可复核的证据。</p></section>
+              <section><h3>工具与测试</h3><p>提供系统实际发生了什么的硬证据，不让模型用语气代替完成。</p></section>
+            </div>
+
+            <p>
+              这不是让开发者少负责，而是让责任落在更有杠杆的位置。我们仍然会看关键代码，但不再幻想靠阅读全部生成代码来维持控制。真正稳定的系统，依靠的是清楚的架构、有限的权限、可观察的状态和不能被语言绕过的验收。
+            </p>
+
+            <aside class="article-callout">
+              <p class="article-callout-title">SuperCoding 的目标不是让 Agent 替人写更多代码。</p>
+              <p>它要让更强的 Agent 在更大的速度下，仍然沿着人能理解、能验证、能纠偏的结构工作。</p>
+            </aside>
+
+            <div class="article-ending">
+              <p>
+                SuperCoding 已经把 SuperDev、SuperGoal 和 SuperReview 合并成一个可安装仓库。顶部的三件装置，就是这套方法的视觉控制面。
+              </p>
+              <a href="https://github.com/fightheyyy/SuperCoding" target="_blank" rel="noreferrer">
+                View SuperCoding on GitHub →
+              </a>
+            </div>
+          </div>
+        </article>
+
+        <footer class="article-footer">
+          <a href="../index.html#blog">← 返回 Tech Blog</a>
+          <span>fightheyyy.github.io</span>
+        </footer>
+      </div>
+    </main>
+
+    <noscript><p class="supercoding-noscript">JavaScript 未启用。顶部保留静态背景，文章仍可完整阅读。</p></noscript>
+    <script src="../assets/posts/supercoding/supercoding-hero.js?v=20260717-2"></script>
+  </body>
+</html>

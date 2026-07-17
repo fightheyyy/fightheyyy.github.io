@@ -1,12 +1,28 @@
 # Fightheyyy.github.io
 
-fightheyyy 的技术博客首页，布局参考 GitHub Profile，用于记录 Agent harness、记忆系统、写作平台和工程实践。首页使用原生 JS 打字机背景，`XiaoBa-CLI` 项目栏使用从 `XiaoBa-OS` 前端移植的黑金 WebGL 猫头动态背景，`GauzMem` 使用原生 WebGL2 Metaballs 背景，`Vibe Writing Platform` 使用轻量 Canvas Hyperspeed 光轨背景。项目是纯静态站点，可以直接用 GitHub Pages 托管。
+Fightheyyy 的个人技术主页与技术博客，关注 Agent Harness、Agentic Eval，以及面向具身机器人的 Voice Agent Harness。
+
+首页是一个连续滚动的纯静态个人索引：名字、自我定位、项目链接、文章链接和 GitHub。没有头像、顶部导航、强制分页、项目卡片或首页 Canvas。自托管的 Syne 可变字体、轮廓式 `yyy` 和非对称编辑排版构成全站视觉识别；两篇长文复用相同的签名页头和标题轴，正文仍使用高可读的系统字体。JavaScript 只提供简短的名字与区块进入动效，关闭 JavaScript 后内容和链接仍然完整可用。
 
 ## 文件
 
-- `index.html`: 技术博客首页内容和页面结构。
-- `styles.css`: 页面视觉样式、响应式布局和动效。
-- `script.js`: `XiaoBa-CLI` 项目栏里的原生 WebGL 小猫背景，移植自 `XiaoBa-OS/src/components/CatOrb`。
+- `index.html`: 个人主页的内容、语义结构和链接。
+- `posts/xiaoba-cli-agent-os.html`: XiaoBa-CLI Agent OS 技术文章。
+- `posts/supercoding-agent-engineering.html`: SuperCoding 架构优先的 Agent 工程方法文章。
+- `styles.css`: 首页与两篇文章共享的白色编辑式视觉系统、签名页头和响应式布局。
+- `script.js`: 首页名字动效、区块进入和低动态降级。
+- `assets/fonts/`: 首页展示字体及其开源许可证，部署时无需运行时字体 CDN。
+- `assets/posts/`: 两篇文章各自作用域内的图片与交互资源。
+
+SuperCoding 的 Canvas 交互保留在文章作用域内，并以浅色编辑插图呈现，不会在文章入口切换成另一套深色主题。
+
+## 本地预览
+
+```bash
+python3 -m http.server 4173 --bind 127.0.0.1
+```
+
+打开 `http://127.0.0.1:4173/`。
 
 ## 部署到 GitHub Pages
 
