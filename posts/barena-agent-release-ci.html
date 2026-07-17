@@ -1,0 +1,351 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="为什么 Agent Eval 的终点不是排行榜，而是发布 CI：Barena 如何用成对实验、重放、Artifact Verifier 和可追溯证据判断一次 Agent 变更能不能发布。"
+    />
+    <meta property="og:type" content="article" />
+    <meta property="og:title" content="Barena：Agent Eval 的终点，不是排行榜，而是发布 CI" />
+    <meta
+      property="og:description"
+      content="真正值得评测的不是一个抽象的 Agent，而是一次具体变更；真正有用的输出不是高分，而是能否发布。"
+    />
+    <meta property="article:published_time" content="2026-07-17" />
+    <title>Barena：Agent Eval 的终点，不是排行榜，而是发布 CI</title>
+    <link rel="canonical" href="https://fightheyyy.github.io/posts/barena-agent-release-ci.html" />
+    <link rel="icon" type="image/png" href="../assets/favicon.png" />
+    <link
+      rel="preload"
+      href="../assets/fonts/syne-latin-wght-normal.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin
+    />
+    <link rel="stylesheet" href="../styles.css?v=20260717-7" />
+  </head>
+  <body class="article-page">
+    <header class="article-site-header">
+      <a class="name article-name-mark" href="../index.html" aria-label="Fightheyyy">
+        <span class="article-name-stem" aria-hidden="true">Fighthe</span>
+        <span class="article-name-tail" aria-hidden="true">yyy</span>
+      </a>
+      <nav class="nav" aria-label="文章导航">
+        <a href="../index.html#blog">Tech Blog</a>
+        <a href="https://github.com/fightheyyy/barena" target="_blank" rel="noreferrer">GitHub</a>
+      </nav>
+    </header>
+
+    <main class="article-shell">
+      <article>
+        <header class="article-header">
+          <p class="article-kicker">Agentic Eval · Release Engineering</p>
+          <h1 aria-label="Barena：Agent Eval 的终点，不是排行榜，而是发布 CI">
+            <span>Barena：</span>
+            <span>Agent Eval 的终点，</span>
+            <span>不是排行榜，</span>
+            <span>而是发布 CI</span>
+          </h1>
+          <p class="article-deck">
+            每一次 Agent 变更都会产生一项证明义务：它是否真的更好、稳定、无回归，而且证据足够。Barena 想做的不是另一个评分器，而是把这项证明义务变成可执行的发布协议。
+          </p>
+          <div class="article-meta">
+            <time datetime="2026-07-17">2026.07.17</time>
+            <span>约 11 分钟阅读</span>
+          </div>
+        </header>
+
+        <div class="article-content">
+          <p class="article-lead">
+            我越来越相信，Agent Eval 的核心不是评分，而是管理“我们有资格相信什么”。当行为同时来自模型、Prompt、Skill、工具、记忆、权限、环境和 Runtime，我们已经无法从代码静态推出最终结果。发布决策因此不只是测试问题，而是在不确定性下建立可信知识的问题。
+          </p>
+
+          <p>
+            这就是我做 Barena 的起点：当代码开始像黑盒，行为就必须成为合同；当行为无法被直接证明，证据就必须成为发布物。一个 Agent release candidate 不应该只提交新模型、新 Prompt 或新 Skill，它还应该提交一份足以说明自己为什么能发布的 evidence package。
+          </p>
+
+          <h2>Agent 发布正在从代码问题变成认识论问题</h2>
+
+          <p>
+            给 Skill 增加一段说明、替换一个模型、开放一个新工具，diff 可能只有几行，但行为变化可能穿过整个系统。模型会不会选择这个 Skill，工具调用是否落在正确目录，记忆是否带入了错误上下文，外部服务短暂失败后 Agent 会不会换一条路径——这些问题无法只从实现中推出答案。
+          </p>
+
+          <p>
+            传统测试擅长证明确定性组件满足局部合同。Agent E2E 要证明的是另一件事：在接近真实的任务压力和运行环境下，这个由多个非确定性部件组成的系统，能否稳定产生可验证的最终状态。
+          </p>
+
+          <aside class="article-callout" aria-label="Barena 的行为合同">
+            <p class="article-callout-title">每一个 Agent 变更都应该背负一项证明义务。</p>
+            <p>
+              候选需要证明的不只是“我能通过”，而是“相比 baseline，我带来了稳定提升，没有破坏旧能力，而且这项结论有足够证据”。Barena 的发布门，本质上是在检查这项 proof obligation 有没有被履行。
+            </p>
+          </aside>
+
+          <h2>Benchmark、Eval 和 Release CI 问的是三件事</h2>
+
+          <div class="article-table-wrap" tabindex="0" role="region" aria-label="Benchmark、Eval 与 Release CI 的区别">
+            <table>
+              <thead>
+                <tr>
+                  <th>机制</th>
+                  <th>核心问题</th>
+                  <th>典型输出</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Benchmark</td>
+                  <td>谁在一组公共任务上表现更好？</td>
+                  <td>分数、排名、能力比较</td>
+                </tr>
+                <tr>
+                  <td>Eval</td>
+                  <td>一个 Agent 在目标任务上表现怎样？</td>
+                  <td>通过率、错误类型、轨迹</td>
+                </tr>
+                <tr>
+                  <td>Release CI</td>
+                  <td>这次具体变更是否有效、稳定、无回归，可以发布吗？</td>
+                  <td><code>cleared</code>、<code>held</code>、<code>rejected</code></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <p>
+            排行榜适合回答模型或 Agent 的相对能力，却很难直接替团队做发布决策。一个 Skill 在公开任务上拿到高分，不代表它对当前 Role 有增益；一个新模型平均分更高，也可能让最关键的回归用例从稳定通过变成偶发失败。
+          </p>
+
+          <p>
+            所以 Barena 不是在寻找“最聪明的 Agent”。它评估的是一次发布候选：同一目标 Runtime、同一组 E2E Case、同一套约束下，从 baseline 到 candidate 到底发生了什么。
+          </p>
+
+          <h2>Release Eval 本质上是一个反事实问题</h2>
+
+          <p>
+            “Candidate 能不能完成任务”只是能力问题；“如果没有这次变更，同一个任务会怎样”才是发布问题。后一个问题天然包含反事实：我们需要观察相同条件下 baseline 与 candidate 的差异，才能把结果尽可能归因于这次变更。
+          </p>
+
+          <pre class="article-flow" role="region" aria-label="Barena 的发布评测输入与输出"><code>Barena(
+  target runtime,
+  baseline configuration,
+  candidate configuration,
+  E2E case pack,
+  replay policy
+)
+  → effectiveness
+  → stability
+  → regressions
+  → evidence
+  → cleared | held | rejected</code></pre>
+
+          <p>
+            这个定义把评测单位从“一个 Agent”改成了“一个变化”。对于 Skill，Barena 在同一个 Role 上比较不加载与加载候选 Skill；对于 Role，它要求显式提供 baseline Role，再和 candidate Role 在固定条件下成对运行。
+          </p>
+
+          <p>
+            所以 Release Eval 可以被看成一种<strong>非确定性条件下的因果推断</strong>。它不试图估计一个 Agent 永恒、抽象的“智能值”，而是回答一个更窄也更可执行的问题：在控制住 Case、Runtime、Role、模型和工具之后，这个 candidate 究竟改变了什么？
+          </p>
+
+          <p>
+            显式 baseline 很重要，因为绝对分数经常制造错觉。假设 baseline 和 candidate 都是 100% 通过，新 Skill 虽然“通过了评测”，却没有证明自己带来任何效果。Barena 会把这种结果标记为 <code>no_effect</code> 并 <code>held</code>，而不是因为候选拿到满分就允许发布。
+          </p>
+
+          <p>
+            反过来，如果总体通过率提升，但某个 regression case 从 100% 降到 50%，平均数也不能替它开脱。Release CI 关心的不只是总体 lift，还要保护不能退化的具体能力。
+          </p>
+
+          <h2>一个高分本身没有因果含义</h2>
+
+          <p>
+            Agent Eval 很容易被模型版本、上下文、工具状态和环境残留污染。Barena 为 baseline 与 candidate 创建独立、干净的 attempt root，固定 Case、Role、模型和工具条件，并给每次尝试保留唯一运行身份。它不能把非确定性变成严格的实验室因果，但能尽量缩小“除了这次变更，还有什么不同”。
+          </p>
+
+          <pre class="article-flow" role="region" aria-label="Barena 成对评测流程"><code>same Role + same Case + fresh runtime
+                │
+        ┌───────┴────────┐
+        │                │
+ baseline: Role     candidate: Role
+ without Skill       with Skill
+        │                │
+     replays           replays
+        └───────┬────────┘
+                ↓
+ verifier-backed lift + regressions + stability</code></pre>
+
+          <p>
+            这里也有一条我刻意不跨越的边界：如果 Runtime 无法表达真实 baseline，系统就不制造一个假的 no-op subject。无法比较不是零分，而是缺少结论；发布状态应该是 <code>held</code>。
+          </p>
+
+          <h2>系统不能用语言证明现实已经改变</h2>
+
+          <p>
+            很多 Agent Eval 仍然把最终回答或 Reviewer 分数当成真相。但一个 Agent 可以很自信地说“文件已经生成”，Reviewer 也可能认为过程合理，磁盘上却根本没有目标文件。语言模型对语言的评价，不能替代对最终世界状态的检查。
+          </p>
+
+          <p>
+            Barena 因此把 native Reviewer score 和 Artifact Verifier 分开。前者帮助理解行为质量，后者检查任务要求的硬结果，例如文件是否存在、内容是否包含预期文本；工作区副作用则由 boundary observation 单独记录。发布门最终依赖 verifier-backed outcome，而不是 Agent 自述。
+          </p>
+
+          <div class="article-table-wrap" tabindex="0" role="region" aria-label="Agent 评测中的三层证据">
+            <table>
+              <thead>
+                <tr>
+                  <th>证据层</th>
+                  <th>回答什么</th>
+                  <th>不能单独证明什么</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Agent final answer</td>
+                  <td>Agent 声称自己做了什么</td>
+                  <td>真实产物已经存在</td>
+                </tr>
+                <tr>
+                  <td>Trace / Reviewer</td>
+                  <td>过程如何发生、哪里可疑</td>
+                  <td>最终状态一定正确</td>
+                </tr>
+                <tr>
+                  <td>Artifact Verifier</td>
+                  <td>可观察结果是否满足断言</td>
+                  <td>隐藏推理一定合理</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <p>
+            三者不是互相替代。最终状态告诉我们任务有没有完成，Trace 解释它如何完成，Reviewer 帮助定位风险。把它们分层，才能避免一个“看起来不错”的模型评分覆盖一个失败的真实结果。
+          </p>
+
+          <h2>结论的强度不能超过证据的边界</h2>
+
+          <p>
+            我在 Barena 里把 Trace 当作整条评测链的 evidence spine。每次尝试都保留任务输入、进程状态、标准输出与错误、工作区变化、Runtime 原生轨迹、Evaluator 阶段和 Verifier 结果。在当前 XiaoBa native 路径中，被接受的证据会复制进评测包并计算哈希，而不是只留下一个可能失效的外部路径。
+          </p>
+
+          <p>
+            更重要的是，证据必须声明 provenance。Barena 自己观察到的 boundary event，只能说它从进程或文件系统边界看见了什么；XiaoBa 产生的 native trace，才属于目标 Runtime 的原生证据。Barena 不会从一段 summary 反推并伪造不存在的 tool call。
+          </p>
+
+          <p>
+            这形成了一个我认为所有 Agent Eval 都应该遵守的上限：<strong>结论的强度，不能高于证据的可观测边界</strong>。只有进程边界证据，就只能声称观察到了输入、输出和副作用；没有 native trace，就不能声称知道内部工具序列；没有 Verifier，就不能把模型判断写成 Outcome Truth。
+          </p>
+
+          <pre class="article-flow" role="region" aria-label="Barena 证据流"><code>User task
+   ↓
+fresh baseline / candidate attempts
+   ↓
+boundary trace + native trace + artifacts
+   ↓
+Reviewer signal + Artifact Verifier
+   ↓
+validated, hash-stamped evidence package
+   ↓
+paired release gate</code></pre>
+
+          <h2>可靠性不是质量指标，而是用户消费的能力</h2>
+
+          <p>
+            非确定性系统最危险的结果不是稳定失败，而是偶尔成功。只跑一次时，一个 flaky candidate 和稳定 candidate 都会显示绿色；进入生产后，前者才暴露出用户需要反复重试。
+          </p>
+
+          <p>
+            Barena 把 replay 设为发布判断的一部分。每个 arm 的尝试会被聚合成 <code>stable_pass</code>、<code>stable_failure</code>、<code>flaky</code>、<code>blocked</code>、<code>unsafe</code> 或 <code>incomplete</code>。有提升但 flaky 的候选仍然是 <code>held</code>，因为“偶尔更好”不是可发布的能力。
+          </p>
+
+          <p>
+            这背后是一个容易被平均分遮住的 insight：稳定性不是效果分数旁边的附加指标，它本身就是 Agent 产品能力的一部分。用户无法消费平均意义上的成功，只能消费眼前这一次任务是否完成。
+          </p>
+
+          <h2>Unknown 不是失败，它是必须保留的真相</h2>
+
+          <p>
+            Eval 系统最糟糕的失败方式，不是报错，而是在缺少运行条件或证据时给出一个看似完整的成功。Barena 因此把发布结论分成三态，而不是简单的 pass / fail：
+          </p>
+
+          <ul class="article-list">
+            <li><strong><code>cleared</code></strong>：候选产生稳定、Verifier 支持的正向提升，没有回归，证据完整。</li>
+            <li><strong><code>held</code></strong>：结果 flaky、无效果、证据不全，或 Runtime、凭证、baseline、sandbox 等前置条件不可用。</li>
+            <li><strong><code>rejected</code></strong>：出现能力回归或不安全行为。</li>
+          </ul>
+
+          <p>
+            <code>held</code> 非常关键。缺少证据不等于失败，更不等于通过；它只表示当前没有足够资格做发布决定。把“未知”单独建模，CI 才不会用一个假精确结论掩盖基础设施问题。
+          </p>
+
+          <p>
+            二值系统会强迫所有未知坍缩成 pass 或 fail：前者制造假信任，后者把基础设施缺失误报成能力失败。<code>held</code> 保留了认识论上的诚实——不是 Agent 一定不行，而是当前证据没有资格让我们说它行。
+          </p>
+
+          <h2>Eval 系统本身也在信任边界之内</h2>
+
+          <p>
+            Barena 当前深度适配 XiaoBa-CLI 0.1.1 的 native Arena，用它评测 Role 和 Skill。但这个版本里的 UserCat、InspectorCat、ReviewerCat 是一条 composite pipeline 的逻辑阶段，不是三个独立的 AgentSession。结果中会明确记录 <code>three_evaluator_agent_sessions=false</code>，而不会为了让架构听起来更完整就改写事实。
+          </p>
+
+          <p>
+            OpenClaw 的外部 TargetAdapter 已经存在，但 XiaoBa 0.1.1 还没有 external-agent target-driver seam，所以这条跨 Runtime 路径当前会 fail closed。Barena 返回明确的 blocked reason，不启动目标、不捏造 target trace，也不用 TypeScript 模拟三个 Evaluator 来伪装成真实运行。
+          </p>
+
+          <p>
+            我认为这种自我约束也是 Agent Eval 的产品能力。评测工具的结论会进入发布决策，它对自身证据边界的诚实程度，和被评测 Agent 的能力一样重要。
+          </p>
+
+          <h2>Agent Release CI 是行为变更的类型系统</h2>
+
+          <p>
+            当 Agent 越来越复杂，人很难靠读完所有 Prompt、轨迹和生成代码维持控制。更可扩展的控制面是：先定义真实任务与最终状态，再让每次行为变更经过相同的成对实验、重放、验证和证据归档。
+          </p>
+
+          <p>
+            我把这种机制理解成行为变更的类型系统。传统类型系统阻止不满足结构合同的程序进入运行阶段；Agent Release CI 则阻止没有履行证明义务的行为变更进入发布阶段。<code>cleared</code> 表示证据满足发布合同，<code>held</code> 表示无法完成类型判断，<code>rejected</code> 表示候选违反了回归或安全不变量。
+          </p>
+
+          <p>
+            这不是数学证明，也不承诺系统从此没有 Bug。它的价值在于把 Eval 从研发阶段的一次性活动，变成每次行为变化都必须经过的持续协议。模型升级、Prompt 修改、Skill 版本、工具权限、Memory 策略和 Runtime 改动，都要回答同一组问题：它是否真的更好，是否稳定，是否破坏了旧能力，我们凭什么相信这个结论？
+          </p>
+
+          <aside class="article-callout" aria-label="Barena 的核心判断">
+            <p class="article-callout-title">未来 Agent 基础设施真正稀缺的，不是产生更多行为，而是判断哪些行为变化值得信任。</p>
+            <p>
+              分数描述表现，反事实比较说明变化，证据建立信任，Release CI 再把它们变成工程纪律：没有稳定提升就不发布，没有完整证据就不假装知道。
+            </p>
+          </aside>
+
+          <h2>Barena 当前仍然有明确边界</h2>
+
+          <ul class="article-list">
+            <li>它是本地 TypeScript CLI / TUI，不是托管 Benchmark 平台或排行榜。</li>
+            <li>Phase 1 聚焦 XiaoBa Role 与 Skill release CI，其他 Runtime 要通过真实 Adapter 和 Evaluator seam 接入。</li>
+            <li>Artifact Verifier 能证明可观察的最终状态，不保证模型隐藏推理一定正确。</li>
+            <li>Replay 能暴露一部分 flakiness，但有限样本不能证明概率意义上的绝对稳定。</li>
+            <li>外部 Runtime 的 policy-only 隔离不是 OS 级 sandbox，报告必须保留这个边界。</li>
+          </ul>
+
+          <p>
+            这些限制不会削弱 Release CI 的方向，反而定义了下一步需要补齐的证据。一个可信的 Agent Eval 系统不需要声称自己看见一切，它需要准确区分看见了什么、没有看见什么，以及现有证据允许做出多强的结论。
+          </p>
+
+          <div class="article-ending">
+            <p>
+              Barena 已经开源了 XiaoBa Role / Skill 成对评测、Replay、Artifact Verifier、证据包和三态发布门。它还很早，但它想验证的方向很清楚：把每次 Agent 变更的证明义务写成一套可执行协议，让行为像代码一样接受发布纪律。
+            </p>
+            <a href="https://github.com/fightheyyy/barena" target="_blank" rel="noreferrer">
+              View Barena on GitHub →
+            </a>
+          </div>
+        </div>
+      </article>
+
+      <footer class="article-footer">
+        <a href="../index.html#blog">← 返回 Tech Blog</a>
+        <span>fightheyyy.github.io</span>
+      </footer>
+    </main>
+  </body>
+</html>
