@@ -5,10 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta
       name="description"
-      content="为什么 XiaoBa-CLI 不只是一个模型套壳，而是一套把模型、工具、角色、证据和自进化组织起来的 Agent Operating System。"
+      content="为什么 xiaobaOS 不只是一个模型套壳，而是一套把模型、工具、角色、证据和自进化组织起来的 Agent Operating System。"
     />
     <meta property="og:type" content="article" />
-    <meta property="og:title" content="XiaoBa-CLI：为什么 Agent Harness 更像一个操作系统" />
+    <meta property="og:title" content="xiaobaOS：为什么 Agent Harness 更像一个操作系统" />
     <meta
       property="og:description"
       content="模型只是 CPU，Runtime 才决定 Agent 如何工作、如何留下证据，以及如何持续进化。"
@@ -18,7 +18,7 @@
       content="https://fightheyyy.github.io/assets/posts/xiaoba-cli-agent-os/agent-os.png"
     />
     <meta property="article:published_time" content="2026-07-16" />
-    <title>XiaoBa-CLI：为什么 Agent Harness 更像一个操作系统</title>
+    <title>xiaobaOS：为什么 Agent Harness 更像一个操作系统</title>
     <link rel="canonical" href="https://fightheyyy.github.io/posts/xiaoba-cli-agent-os.html" />
     <link rel="icon" type="image/png" href="../assets/favicon.png" />
     <link
@@ -46,8 +46,8 @@
       <article>
         <header class="article-header">
           <p class="article-kicker">Agent Harness · Architecture</p>
-          <h1 aria-label="XiaoBa-CLI：为什么 Agent Harness 更像一个操作系统">
-            <span>XiaoBa-CLI：</span>
+          <h1 aria-label="xiaobaOS：为什么 Agent Harness 更像一个操作系统">
+            <span>xiaobaOS：</span>
             <span>为什么 Agent Harness</span>
             <span>更像操作系统</span>
           </h1>
@@ -62,12 +62,12 @@
 
         <div class="article-content">
           <p class="article-lead">
-            大模型越来越强，但一个更强的模型，并不会自然变成一个可靠的工作系统。它仍然需要知道任务从哪里进入、该由谁处理、可以调用什么、什么时候算完成，以及失败后如何复盘。XiaoBa-CLI
+            大模型越来越强，但一个更强的模型，并不会自然变成一个可靠的工作系统。它仍然需要知道任务从哪里进入、该由谁处理、可以调用什么、什么时候算完成，以及失败后如何复盘。xiaobaOS
             做的，正是模型上下这些经常被忽略的部分。
           </p>
 
           <p>
-            所以我更愿意把 XiaoBa-CLI 看成一个 <strong>Agent Operating System</strong>：它不生产智能本身，而是把模型的计算能力组织成可交付、可复盘、能受控进化的 Agent。
+            所以我更愿意把 xiaobaOS 看成一个 <strong>Agent Operating System</strong>：它不生产智能本身，而是把模型的计算能力组织成可交付、可复盘、能受控进化的 Agent。
           </p>
 
           <figure class="article-figure">
@@ -75,13 +75,13 @@
               <a href="../assets/posts/xiaoba-cli-agent-os/agent-os.png" target="_blank">
                 <img
                   src="../assets/posts/xiaoba-cli-agent-os/agent-os.png"
-                  alt="XiaoBa-CLI Agent Operating System 架构：底层是 Models 与 Drivers，中间是 Agent Runtime，上层是 Base、Roles 与 Skills，运行证据进入自进化反馈循环。"
+                  alt="xiaobaOS Agent Operating System 架构：底层是 Models 与 Drivers，中间是 Agent Runtime，上层是 Base、Roles 与 Skills，运行证据进入自进化反馈循环。"
                   width="1429"
                   height="1101"
                 />
               </a>
             </div>
-            <figcaption>图 1：XiaoBa-CLI 的 Agent OS 分层，以及由运行证据驱动的自进化回路。点击可查看原图。</figcaption>
+            <figcaption>图 1：xiaobaOS 的 Agent OS 分层，以及由运行证据驱动的自进化回路。点击可查看原图。</figcaption>
           </figure>
 
           <h2>模型是 CPU，不是操作系统</h2>
@@ -90,12 +90,12 @@
             CPU 很重要，但只有 CPU 的机器无法完成工作。进程调度、设备访问、文件系统、权限边界和故障处理，都是操作系统必须承担的职责。Agent 也一样：模型提供推理与生成，却不应该同时承担会话入口、角色路由、工具协议、交付确认和评测门禁。
           </p>
 
-          <div class="article-table-wrap" tabindex="0" role="region" aria-label="操作系统与 XiaoBa-CLI 的对应关系">
+          <div class="article-table-wrap" tabindex="0" role="region" aria-label="操作系统与 xiaobaOS 的对应关系">
             <table>
               <thead>
                 <tr>
                   <th>计算机系统</th>
-                  <th>XiaoBa-CLI</th>
+                  <th>xiaobaOS</th>
                   <th>负责什么</th>
                 </tr>
               </thead>
@@ -140,7 +140,7 @@
 
           <h2>一次真实任务是怎样运行的</h2>
 
-          <pre class="article-flow" aria-label="XiaoBa-CLI 任务运行链路"><code>CLI / IM / Desktop
+          <pre class="article-flow" aria-label="xiaobaOS 任务运行链路"><code>CLI / IM / Desktop
         ↓
 Base Main Agent
         ↓ dispatch
@@ -168,7 +168,7 @@ Delivery + Trace + Artifact Evidence</code></pre>
           <h2>为什么 Driver 不是另一个 Agent</h2>
 
           <p>
-            浏览器、桌面 GUI 和飞书工作流都很复杂，但 XiaoBa-CLI 没有为它们再启动第二套 Chat / Agent / MCP 循环。BrowserCat、GuiCat、SecretaryCat
+            浏览器、桌面 GUI 和飞书工作流都很复杂，但 xiaobaOS 没有为它们再启动第二套 Chat / Agent / MCP 循环。BrowserCat、GuiCat、SecretaryCat
             仍然负责判断和编排，底层 Driver 只暴露确定性能力：打开页面、点击控件、读写文件、发送消息。
           </p>
 
@@ -179,7 +179,7 @@ Delivery + Trace + Artifact Evidence</code></pre>
           <h2>“完成了”必须有证据</h2>
 
           <p>
-            Agent 最危险的错觉之一，是把一段语气确定的回复当成任务完成。XiaoBa-CLI 把模型调用、工具结果、生成文件、实际交付和失败信息写入 trace；文件是否存在、消息是否送达、页面是否真的变化，需要由 artifact、delivery evidence 或硬验证器确认。
+            Agent 最危险的错觉之一，是把一段语气确定的回复当成任务完成。xiaobaOS 把模型调用、工具结果、生成文件、实际交付和失败信息写入 trace；文件是否存在、消息是否送达、页面是否真的变化，需要由 artifact、delivery evidence 或硬验证器确认。
           </p>
 
           <p>这套证据链支撑三种不同的验证方式：</p>
@@ -223,7 +223,7 @@ Delivery + Trace + Artifact Evidence</code></pre>
           <h2>这个 OS 类比的边界</h2>
 
           <p>
-            XiaoBa-CLI 不是通用操作系统，也不提供内核级进程隔离。更准确地说，它是 Agent 软件栈中的 Runtime 与控制面：向下统一模型、工具和环境，向上承载角色、Skills 与真实工作流，并用证据和评测守住变化边界。
+            xiaobaOS 不是通用操作系统，也不提供内核级进程隔离。更准确地说，它是 Agent 软件栈中的 Runtime 与控制面：向下统一模型、工具和环境，向上承载角色、Skills 与真实工作流，并用证据和评测守住变化边界。
           </p>
 
           <p>
@@ -232,10 +232,10 @@ Delivery + Trace + Artifact Evidence</code></pre>
 
           <div class="article-ending">
             <p>
-              XiaoBa-CLI 仍在持续演进。如果你也在研究 Agent Harness、可观测性或 Agentic Eval，可以直接查看项目源码和当前架构。
+              xiaobaOS 仍在持续演进。如果你也在研究 Agent Harness、可观测性或 Agentic Eval，可以直接查看项目源码和当前架构。
             </p>
             <a href="https://github.com/fightheyyy/XiaoBa-CLI" target="_blank" rel="noreferrer">
-              View XiaoBa-CLI on GitHub →
+              View xiaobaOS on GitHub →
             </a>
           </div>
         </div>
