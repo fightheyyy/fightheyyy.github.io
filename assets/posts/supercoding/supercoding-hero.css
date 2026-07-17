@@ -197,6 +197,8 @@
 
 .supercoding-article-shell .article-header {
   max-width: 900px;
+  margin-right: auto;
+  margin-left: auto;
 }
 
 .supercoding-article-shell .article-header h1 {
