@@ -286,50 +286,21 @@ temporal context</code></pre>
           <h2>短期记忆与长期记忆不应该互相等待</h2>
 
           <p>
-            一段对话进入 GauzMem 后，原始 Chunk 会先成为可用的短期记忆，同时后台任务继续抽取 Fact、Entity、Relation 和 Topic，并更新向量与图谱投影。调用方会立即拿到 conversation_id、task_id、status_url 和 SSE 地址，不需要等完整编译流程结束才记住刚刚说过的话。
+            一段对话进入 GauzMem 后，原始 Chunk 会先成为可用的短期记忆，后台再继续抽取 Fact、Entity、Relation 和 Topic，并更新向量与图谱投影。这个顺序的重点不是“用了异步任务”，而是先保住证据，再生产解释：即使后面的编译暂时失败，刚刚发生的对话仍然存在，也仍然可以重新加工。
           </p>
 
           <p>
             这让写入延迟和记忆质量可以分开优化：短期路径优先保证“刚说过的话不会忘”，长期路径再负责把原始对话编译成更稳定的知识结构。项目已经实测的结果包括短期记忆可用时间小于 1 秒、向量召回小于 100 ms、图召回小于 500 ms，以及 SOTA 长期记忆表现。
           </p>
 
-          <h2>一次完整的三路召回请求</h2>
-
-          <pre class="article-flow" role="region" aria-label="GauzMem 三路召回 API 示例"><code>curl -X POST http://localhost:1235/api/v1/memories/search/bundle \
-  -H 'Content-Type: application/json' \
-  -H "X-API-Key: ${GAUZ_API_KEY}" \
-  -d '{
-    "query": "为什么发布日期变了？",
-    "project_id": "demo",
-    "top_k": 5,
-    "use_bm25": true,
-    "expansions": {
-      "graph": {
-        "enabled": true,
-        "max_hops": 2,
-        "relation_types": ["CAUSE", "SUPPORT"]
-      },
-      "temporal": {
-        "enabled": true,
-        "mode": "turn",
-        "hop_distance": 1,
-        "direction": "both"
-      }
-    }
-  }'</code></pre>
+          <h2>三路召回不是从零并行，而是先找到记忆锚点</h2>
 
           <p>
-            这个请求先从语义索引找到相关 Fact，再沿 CAUSE 和 SUPPORT 关系最多扩两跳，同时向前后各补一轮对话。调用方只声明需要什么上下文，不需要自己编排三个数据库。
-          </p>
-
-          <h2>为什么核心服务继续使用 Python</h2>
-
-          <p>
-            GauzMem 是独立可部署服务，但“独立”不等于必须用 Go 重写。当前复杂度主要在 LLM、Embedding、文本处理、异步编排和检索实验，Python 的库生态以及现有实现仍然提供最高迭代效率。
+            把三路召回理解成“三个数据库各查一次”仍然不够准确。图谱不知道应该从哪里开始遍历，时间也不知道应该围绕哪一刻展开。语义召回的真正价值不是直接给出最终答案，而是先把查询收敛成一小组 seed Facts，为后两条路径确定记忆锚点。
           </p>
 
           <p>
-            如果未来出现高并发流式接入、边缘代理或轻量 SDK，可以把这些边界拆成 Go 组件；核心 memory compiler 没有必要为了语言偏好重新实现。先把边界做清楚，比先换语言更重要。
+            有了锚点，图谱扩展才能回答“这条事实沿什么关系连到另一条事实”，时序扩展才能回答“这条事实前后发生了什么”。因此，先语义、再扩展不是数据库编排技巧，而是一条认识论约束：每一段新增上下文，都必须能够说明自己从哪条记忆出发，以及为什么被带回来。
           </p>
 
           <h2>这套设计仍然有明确边界</h2>
@@ -354,7 +325,7 @@ temporal context</code></pre>
 
           <div class="article-ending">
             <p>
-              GauzMem 已经作为独立、可自托管的 Python 服务开源，包含 FastAPI、Docker Compose、三路召回 API 和完整部署说明。
+              GauzMem 已经开源。对我而言，它首先是一份可运行的架构判断：Agent 的记忆不应止于保存和命中，而应该能够沿证据、关系和时间重新组织上下文。
             </p>
             <a href="https://github.com/fightheyyy/gauzmem" target="_blank" rel="noreferrer">
               View GauzMem on GitHub →
