@@ -641,8 +641,9 @@ figure {
 }
 
 .identity-copy {
-  max-width: 850px;
-  margin-left: clamp(3rem, 13vw, 9rem);
+  width: min(100%, 850px);
+  margin-right: auto;
+  margin-left: auto;
 }
 
 .identity-primary {
@@ -655,9 +656,10 @@ figure {
 }
 
 .identity-secondary {
-  max-width: 650px;
+  width: min(100%, 650px);
   margin-bottom: 0;
-  margin-left: clamp(1.5rem, 4vw, 3.5rem);
+  margin-right: auto;
+  margin-left: auto;
   color: var(--muted);
   font-size: clamp(0.98rem, 1.5vw, 1.12rem);
   line-height: 1.65;
@@ -665,9 +667,9 @@ figure {
 
 .index-section {
   display: grid;
-  grid-template-columns: minmax(120px, 160px) minmax(0, 1fr);
+  grid-template-columns: minmax(0, 1fr) minmax(0, 720px) minmax(0, 1fr);
   align-items: start;
-  column-gap: clamp(3rem, 7vw, 6.5rem);
+  column-gap: 0;
   padding: clamp(4.25rem, 7vw, 6.25rem) 0;
   border-top: 1px solid var(--line);
 }
@@ -677,6 +679,7 @@ figure {
 }
 
 .section-title {
+  grid-column: 1;
   margin: 0;
   font-family: var(--display);
   font-size: clamp(1.9rem, 3vw, 2.55rem);
@@ -820,6 +823,20 @@ figure {
   }
 }
 
+@media (max-width: 980px) {
+  .index-section {
+    display: block;
+  }
+
+  .section-title {
+    margin-bottom: 2rem;
+  }
+
+  .link-index {
+    grid-column: auto;
+  }
+}
+
 @media (max-width: 820px) {
   .personal-home,
   .personal-footer {
@@ -851,17 +868,11 @@ figure {
   }
 
   .index-section {
-    display: block;
     padding: 3.75rem 0;
   }
 
   .section-title {
-    margin-bottom: 2rem;
     font-size: clamp(2rem, 8vw, 2.5rem);
-  }
-
-  .link-index {
-    grid-column: auto;
   }
 
   .index-link {
@@ -966,8 +977,8 @@ figure {
 
 .article-header {
   display: grid;
-  grid-template-columns: minmax(120px, 160px) minmax(0, 1fr);
-  column-gap: clamp(3rem, 7.5vw, 6.5rem);
+  grid-template-columns: minmax(0, 1fr) minmax(0, 720px) minmax(0, 1fr);
+  column-gap: 0;
   margin-bottom: 5.5rem;
 }
 
@@ -1034,7 +1045,7 @@ figure {
 .article-content > .article-flow,
 .article-content > .article-ending {
   width: min(100%, 720px);
-  margin-right: 0;
+  margin-right: auto;
   margin-left: auto;
 }
 
@@ -1260,7 +1271,7 @@ figure {
   width: min(100%, 720px);
   justify-content: space-between;
   gap: 1rem;
-  margin: 4rem 0 0 auto;
+  margin: 4rem auto 0;
   padding-top: 1.2rem;
   border-top: 1px solid var(--line);
   color: var(--faint);
@@ -1268,7 +1279,7 @@ figure {
   font-size: 0.8rem;
 }
 
-@media (max-width: 820px) {
+@media (max-width: 980px) {
   .article-header {
     display: block;
   }
