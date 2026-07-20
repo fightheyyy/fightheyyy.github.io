@@ -1,0 +1,20 @@
+.article-figure-wide {
+  width: min(1200px, calc(100vw - 64px));
+  margin-right: auto;
+  margin-left: 50%;
+  transform: translateX(-50%);
+}
+
+.barena-architecture-figure img {
+  width: 1200px;
+  max-width: none;
+}
+
+@media (max-width: 760px) {
+  .article-figure-wide {
+    width: 100%;
+    margin-right: 0;
+    margin-left: 0;
+    transform: none;
+  }
+}

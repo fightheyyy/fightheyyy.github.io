@@ -1,0 +1,56 @@
+%% Barena reader map — paired execution, two evidence lanes, release gate
+flowchart LR
+    subgraph Change["1 · RELEASE CONTRACT"]
+        direction TB
+        Candidate["Agent change<br/>Role / Skill / Runtime"]
+        Pair["Paired contract<br/>Baseline ↔ Candidate"]
+        Cases["E2E case pack<br/>same task + assertions"]
+        Candidate --> Pair
+        Pair --> Cases
+    end
+
+    subgraph Execution["2 · FRESH EXECUTION"]
+        direction TB
+        Preflight["Fail-closed preflight<br/>runtime · version · sandbox"]
+        Attempts["Independent attempts × N<br/>fresh roots + run IDs"]
+        Target["XiaoBa native Arena<br/>Target AgentSession"]
+        Preflight --> Attempts
+        Attempts --> Target
+    end
+
+    subgraph Evidence["3 · TWO EVIDENCE LANES"]
+        direction TB
+        Behavior["BEHAVIOR EVIDENCE<br/>Native trace + Reviewer signal"]
+        Reality["OUTCOME EVIDENCE<br/>Artifact Verifier + boundary events"]
+        Package["Validated evidence package<br/>provenance + content hashes"]
+        Behavior --> Package
+        Reality --> Package
+    end
+
+    subgraph Gate["4 · RELEASE GATE"]
+        direction TB
+        Validity["Is the experiment valid?<br/>missing evidence stays unknown"]
+        Contract["Truth · Lift · Stability<br/>Regressions · Evidence"]
+        Decision["CLEARED · HELD · REJECTED"]
+        Validity --> Contract
+        Contract --> Decision
+    end
+
+    Change --> Execution
+    Execution --> Evidence
+    Evidence --> Gate
+
+    classDef input fill:#f7f6f1,stroke:#b9b7af,color:#171715,stroke-width:1.5px;
+    classDef signal fill:#eef2ff,stroke:#0645ff,color:#10205f,stroke-width:2px;
+    classDef evidence fill:#f2f6f3,stroke:#4d7060,color:#183327,stroke-width:1.5px;
+    classDef decision fill:#171715,stroke:#171715,color:#ffffff,stroke-width:2px;
+
+    class Candidate,Cases,Preflight,Attempts,Target input;
+    class Pair,Validity,Contract signal;
+    class Behavior,Reality,Package evidence;
+    class Decision decision;
+
+    style Change fill:#ffffff,stroke:#d8d6cf,stroke-width:1px
+    style Execution fill:#ffffff,stroke:#d8d6cf,stroke-width:1px
+    style Evidence fill:#ffffff,stroke:#d8d6cf,stroke-width:1px
+    style Gate fill:#ffffff,stroke:#d8d6cf,stroke-width:1px

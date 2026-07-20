@@ -25,6 +25,7 @@
       crossorigin
     />
     <link rel="stylesheet" href="../styles.css?v=20260717-8" />
+    <link rel="stylesheet" href="../assets/posts/barena/barena.css?v=20260720-1" />
   </head>
   <body class="article-page">
     <header class="article-site-header">
@@ -53,7 +54,7 @@
           </p>
           <div class="article-meta">
             <time datetime="2026-07-17">2026.07.17</time>
-            <span>约 11 分钟阅读</span>
+            <span>约 14 分钟阅读</span>
           </div>
         </header>
 
@@ -82,6 +83,28 @@
               候选需要证明的不只是“我能通过”，而是“相比 baseline，我带来了稳定提升，没有破坏旧能力，而且这项结论有足够证据”。Barena 的发布门，本质上是在检查这项 proof obligation 有没有被履行。
             </p>
           </aside>
+
+          <figure class="article-figure article-figure-wide barena-architecture-figure">
+            <div class="article-figure-scroll" tabindex="0" aria-label="可横向滚动的 Barena Agent Release CI 架构图">
+              <a href="../assets/posts/barena/architecture.png" target="_blank" rel="noreferrer">
+                <img
+                  src="../assets/posts/barena/architecture.png"
+                  alt="Barena 架构：发布变更进入成对 Runner，在 XiaoBa native Arena 中执行；原生 Trace 与 Reviewer 信号、Artifact Verifier 与边界事件形成两路证据，经过校验和哈希后进入 cleared、held、rejected 发布门。"
+                  width="3506"
+                  height="998"
+                  loading="lazy"
+                  decoding="async"
+                />
+              </a>
+            </div>
+            <figcaption>
+              图 1：Barena 的核心不是“跑一个 Agent 再打分”，而是把同一次变更送进成对实验，让行为证据与结果证据汇合后再做发布判断。手机端可左右滑动，或点击查看原图。
+            </figcaption>
+          </figure>
+
+          <p>
+            这张图里最重要的不是流水线有多少阶段，而是发布门只接受 evidence package。Native Trace 与 Reviewer 解释“过程怎样发生”，Artifact Verifier 与 boundary event 检查“现实里究竟改变了什么”；任何一路缺失，结论都会降级，而不是由另一路代填。
+          </p>
 
           <h2>Benchmark、Eval 和 Release CI 问的是三件事</h2>
 
@@ -280,6 +303,74 @@ paired release gate</code></pre>
 
           <p>
             二值系统会强迫所有未知坍缩成 pass 或 fail：前者制造假信任，后者把基础设施缺失误报成能力失败。<code>held</code> 保留了认识论上的诚实——不是 Agent 一定不行，而是当前证据没有资格让我们说它行。
+          </p>
+
+          <h2>一个真实案例：没有分数，比错误的分数更有价值</h2>
+
+          <p>
+            2026 年 7 月 20 日，我在本机真正发起了一次 XiaoBa Skill 成对评测：baseline 与 candidate 各计划 2 次独立 attempt，固定同一个 <code>engineer-cat</code> Role 和同一个 Artifact Case。这不是 fake CLI 跑出的绿色单测；Preflight 检查的是本机真实 XiaoBa 可执行文件。它没有得到一张好看的成绩单，因为 Barena 在模型执行前发现了更根本的问题：当前 Adapter 锁定 XiaoBa <code>0.1.1</code>，本机实际安装的是 <code>0.2.0</code>。
+          </p>
+
+          <div class="article-table-wrap" tabindex="0" role="region" aria-label="Barena 真实 fail-closed 评测案例">
+            <table>
+              <thead>
+                <tr>
+                  <th>检查项</th>
+                  <th>真实记录</th>
+                  <th>Barena 如何解释</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Runtime preflight</td>
+                  <td>期望 <code>0.1.1</code>，观测到 <code>0.2.0</code></td>
+                  <td>CLI 命令存在，不等于证据语义仍兼容</td>
+                </tr>
+                <tr>
+                  <td>Paired attempts</td>
+                  <td>计划 4 次，实际启动 0 次</td>
+                  <td>在实验合同失效时，不让模型结果进入样本</td>
+                </tr>
+                <tr>
+                  <td>Outcome truth</td>
+                  <td><code>unverified</code>，Verifier 证据 0 / 4</td>
+                  <td>没有 Artifact 证据，就没有任务成功事实</td>
+                </tr>
+                <tr>
+                  <td>Effectiveness</td>
+                  <td>两边通过率与 observed lift 均为 <code>null</code></td>
+                  <td>未知不是 0%，更不能被写成无效果</td>
+                </tr>
+                <tr>
+                  <td>Release decision</td>
+                  <td><code>held / xiaoba_version_unsupported</code></td>
+                  <td>拒绝发布结论，同时保留可诊断的 reason code</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <pre class="article-flow" role="region" aria-label="真实 Barena 评测结果摘录"><code>{
+  "evaluation_id": "xiaoba-skill-eval-20260720021821-38d94c",
+  "decision": "held",
+  "reason_code": "xiaoba_version_unsupported",
+  "summary": "Expected XiaoBa 0.1.1, observed 0.2.0.",
+  "outcome_truth": "unverified",
+  "baseline_pass_rate": null,
+  "candidate_pass_rate": null,
+  "observed_lift": null
+}</code></pre>
+
+          <p>
+            这不是一次“Agent 能力失败”，而是一次<strong>评测资格失败</strong>。如果 Barena 忽略版本差异，强行把 0.2.0 的输出塞进 0.1.1 的证据合同，那么后面的任何通过率都会精确地描述一个没有被定义清楚的实验。Fail-closed 在这里产出的不是分数，而是一张拒绝证书：它证明当前系统没有越过自己能知道的边界。
+          </p>
+
+          <p>
+            也必须把边界讲清楚：这不是一次完成了模型推理的能力对比，不能拿来证明 candidate 更强或更弱。它是一条真实的评测基础设施案例，证明 Barena 在实验无效时会停在第一个不可信的位置，并把“没有执行”保留为“没有结论”。
+          </p>
+
+          <p>
+            这也让我更确定，Release Eval 的第一产物不是 score，而是 validity。只有 Runtime、输入、隔离和证据协议先成立，baseline / candidate 的差异才有因果意义。一个会诚实返回 <code>null</code> 的评测系统，往往比一个总能返回数字的评测系统更接近生产可用。
           </p>
 
           <h2>Eval 系统本身也在信任边界之内</h2>

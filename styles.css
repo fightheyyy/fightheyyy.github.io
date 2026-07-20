@@ -773,7 +773,13 @@ figure {
   border-top: 1px solid var(--line);
 }
 
-.personal-footer a {
+.social-links {
+  display: flex;
+  align-items: center;
+  gap: 1.4rem;
+}
+
+.social-links a {
   display: inline-flex;
   min-height: 2.75rem;
   align-items: center;
@@ -782,9 +788,10 @@ figure {
   font-size: 0.9rem;
   font-weight: 640;
   text-decoration: none;
+  transition: color 180ms ease;
 }
 
-.personal-footer a:hover {
+.social-links a:hover {
   color: var(--accent);
 }
 
