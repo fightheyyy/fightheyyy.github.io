@@ -1225,33 +1225,6 @@ figure {
   color: var(--accent);
 }
 
-.evolution-loop {
-  display: flex;
-  width: min(100%, 860px);
-  align-items: center;
-  justify-content: center;
-  gap: 0.65rem;
-  margin: 2rem 0 2rem auto;
-  padding: 1rem;
-  overflow-x: auto;
-  border: 1px solid var(--line);
-  border-radius: var(--radius);
-  white-space: nowrap;
-}
-
-.evolution-loop span {
-  padding: 0.48rem 0.7rem;
-  border: 1px solid var(--line);
-  border-radius: calc(var(--radius) / 2);
-  color: var(--muted);
-  font-size: 0.74rem;
-}
-
-.evolution-loop b {
-  color: var(--accent);
-  font-weight: 400;
-}
-
 .article-ending {
   margin-top: 4.5rem;
   padding: 1.5rem 0;
@@ -1440,10 +1413,6 @@ figure {
   .article-content p,
   .article-list {
     font-size: 0.96rem;
-  }
-
-  .evolution-loop {
-    justify-content: flex-start;
   }
 
   .article-footer {

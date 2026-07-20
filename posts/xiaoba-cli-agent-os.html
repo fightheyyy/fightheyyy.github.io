@@ -197,27 +197,29 @@ Delivery + Trace + Artifact Evidence</code></pre>
           <h2>自进化不是第四层，而是一条反馈回路</h2>
 
           <p>
-            如果把自进化画成架构顶部的又一层，会让人误以为它只是一个额外功能。实际上，它横跨整个系统：每一次任务都可能留下新的失败模式、成功策略和环境证据，这些信息再反过来推动 Runtime、Role 或 Skill 的候选改进。
+            如果把自进化画成架构顶部的又一层，会让人误以为它只是一个额外功能。实际上，它是一张由证据驱动的 DAG：真实 Session 留下运行事实，Runtime 只负责收割并生成 Digest，InspectorCat 才是第一个进行判断的模型角色。
           </p>
 
-          <div class="evolution-loop" aria-label="自进化反馈回路">
-            <span>Trace &amp; Evidence</span>
-            <b>→</b>
-            <span>Inspect Patterns</span>
-            <b>→</b>
-            <span>Evolve Candidate</span>
-            <b>→</b>
-            <span>Arena Replay</span>
-            <b>→</b>
-            <span>Reviewable Growth</span>
-          </div>
+          <figure class="article-figure">
+            <div class="article-figure-scroll">
+              <a href="../assets/posts/xiaoba-cli-agent-os/self-evolution-dag.png" target="_blank">
+                <img
+                  src="../assets/posts/xiaoba-cli-agent-os/self-evolution-dag.png"
+                  alt="xiaobaOS 自进化 DAG：真实 Session Traces 经 Runtime Harvest 生成 Digest，由 InspectorCat 路由到 evolution、repair、replay 或 no-op；候选分别经过 Reviewer 或 Arena 验收。"
+                  width="2946"
+                  height="1330"
+                />
+              </a>
+            </div>
+            <figcaption>图 2：同一份运行证据进入四条受控路径；虚线表示复审或显式晋升边界，而不是自动改写生产系统。点击可查看原图。</figcaption>
+          </figure>
 
           <p>
-            InspectorCat 从证据中提取模式，EvolutionCat 形成可审查的候选能力，Arena 用新鲜运行、硬验证器和多次尝试检验它。候选与生产能力始终分离：一次看似成功的运行不会直接改写正在工作的系统。
+            InspectorCat 只输出类型化 route。可泛化能力进入 EvolutionCat，先形成隔离的 Skill / Role Candidate，再由 Arena 做多场景能力验收；工程问题进入 EngineerCat 的隔离 Patch Candidate，并由 ReviewerCat 对冻结 Case 做正式回放。纯 replay 直接交给 ReviewerCat，证据不足则明确 no-op。
           </p>
 
           <p>
-            因此这里的“自”不是无边界自治，而是系统能够自己观察运行结果、提出改进并证明改进是否成立。它进化的依据不是感觉，而是证据。
+            因此这里的“自”不是无边界自治，而是系统能够自己观察运行结果、提出改进并证明改进是否成立。Arena 通过也不会自动改写生产资产；Candidate → Active 仍然是有证据绑定的显式晋升动作。
           </p>
 
           <h2>这个 OS 类比的边界</h2>
