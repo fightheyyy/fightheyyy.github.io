@@ -10,11 +10,32 @@
   max-width: none;
 }
 
+.barena-results-figure {
+  width: min(760px, 100%);
+  margin-right: auto;
+  margin-left: auto;
+}
+
+.barena-results-figure img {
+  width: 100%;
+  max-width: 100%;
+}
+
 @media (max-width: 760px) {
   .article-figure-wide {
     width: 100%;
     margin-right: 0;
     margin-left: 0;
     transform: none;
+  }
+
+  .barena-results-figure {
+    margin-right: 0;
+    margin-left: 0;
+  }
+
+  .barena-results-figure img {
+    width: 100%;
+    max-width: 100%;
   }
 }

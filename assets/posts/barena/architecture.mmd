@@ -1,56 +1,65 @@
-%% Barena reader map — paired execution, two evidence lanes, release gate
+%% Barena reader map — three product entries, one runtime boundary, evidence-backed judgment
 flowchart LR
-    subgraph Change["1 · RELEASE CONTRACT"]
+    subgraph Entry["1 · PRODUCT ENTRY"]
         direction TB
-        Candidate["Agent change<br/>Role / Skill / Runtime"]
-        Pair["Paired contract<br/>Baseline ↔ Candidate"]
-        Cases["E2E case pack<br/>same task + assertions"]
-        Candidate --> Pair
-        Pair --> Cases
+        Explore["Explore<br/>find unknown boundaries"]
+        Replay["Replay<br/>protect known behavior"]
+        Compare["Compare<br/>baseline vs candidate"]
     end
 
-    subgraph Execution["2 · FRESH EXECUTION"]
+    subgraph Method["2 · TEST METHOD"]
         direction TB
-        Preflight["Fail-closed preflight<br/>runtime · version · sandbox"]
-        Attempts["Independent attempts × N<br/>fresh roots + run IDs"]
-        Target["XiaoBa native Arena<br/>Target AgentSession"]
-        Preflight --> Attempts
-        Attempts --> Target
+        UserCat["UserCat<br/>multi-turn user simulation"]
+        FixedCase["Fixed Case<br/>repeatable task + assertions"]
+        PairedPlan["Paired plan<br/>same task · isolated attempts"]
     end
 
-    subgraph Evidence["3 · TWO EVIDENCE LANES"]
+    subgraph Runtime["3 · RUNTIME BOUNDARY"]
         direction TB
-        Behavior["BEHAVIOR EVIDENCE<br/>Native trace + Reviewer signal"]
-        Reality["OUTCOME EVIDENCE<br/>Artifact Verifier + boundary events"]
-        Package["Validated evidence package<br/>provenance + content hashes"]
-        Behavior --> Package
-        Reality --> Package
+        Adapter["Runtime / Target Adapter<br/>session · turn · cancellation"]
+        Targets["Target Agent<br/>XiaoBaOS · OpenClaw · Portable CLI"]
+        Adapter --> Targets
     end
 
-    subgraph Gate["4 · RELEASE GATE"]
+    subgraph Evidence["4 · EXECUTION EVIDENCE"]
         direction TB
-        Validity["Is the experiment valid?<br/>missing evidence stays unknown"]
-        Contract["Truth · Lift · Stability<br/>Regressions · Evidence"]
-        Decision["CLEARED · HELD · REJECTED"]
-        Validity --> Contract
-        Contract --> Decision
+        Trace["OTel / OTLP Trace<br/>runtime + boundary provenance"]
+        Outcome["Artifact + Verifier<br/>observable final state"]
     end
 
-    Change --> Execution
-    Execution --> Evidence
-    Evidence --> Gate
+    subgraph Judgment["5 · EVALUATION RESULT"]
+        direction TB
+        Review["InspectorCat + ReviewerCat<br/>failure analysis + score"]
+        Result["Explore report / RunSet<br/>cleared · held · rejected"]
+        Review --> Result
+    end
 
-    classDef input fill:#f7f6f1,stroke:#b9b7af,color:#171715,stroke-width:1.5px;
-    classDef signal fill:#eef2ff,stroke:#0645ff,color:#10205f,stroke-width:2px;
-    classDef evidence fill:#f2f6f3,stroke:#4d7060,color:#183327,stroke-width:1.5px;
-    classDef decision fill:#171715,stroke:#171715,color:#ffffff,stroke-width:2px;
+    Explore --> UserCat
+    Replay --> FixedCase
+    Compare --> PairedPlan
+    UserCat --> Adapter
+    FixedCase --> Adapter
+    PairedPlan --> Adapter
+    Targets --> Trace
+    Targets --> Outcome
+    Trace --> Review
+    Outcome --> Review
 
-    class Candidate,Cases,Preflight,Attempts,Target input;
-    class Pair,Validity,Contract signal;
-    class Behavior,Reality,Package evidence;
-    class Decision decision;
+    classDef entry fill:#eef2ff,stroke:#0645ff,color:#10205f,stroke-width:2px;
+    classDef method fill:#f7f6f1,stroke:#8d8a80,color:#171715,stroke-width:1.5px;
+    classDef runtime fill:#fff7ed,stroke:#c25c16,color:#632d0a,stroke-width:1.5px;
+    classDef evidence fill:#edf7f1,stroke:#3f765e,color:#183327,stroke-width:1.5px;
+    classDef result fill:#171715,stroke:#171715,color:#ffffff,stroke-width:2px;
 
-    style Change fill:#ffffff,stroke:#d8d6cf,stroke-width:1px
-    style Execution fill:#ffffff,stroke:#d8d6cf,stroke-width:1px
+    class Explore,Replay,Compare entry;
+    class UserCat,FixedCase,PairedPlan method;
+    class Adapter,Targets runtime;
+    class Trace,Outcome evidence;
+    class Review method;
+    class Result result;
+
+    style Entry fill:#ffffff,stroke:#d8d6cf,stroke-width:1px
+    style Method fill:#ffffff,stroke:#d8d6cf,stroke-width:1px
+    style Runtime fill:#ffffff,stroke:#d8d6cf,stroke-width:1px
     style Evidence fill:#ffffff,stroke:#d8d6cf,stroke-width:1px
-    style Gate fill:#ffffff,stroke:#d8d6cf,stroke-width:1px
+    style Judgment fill:#ffffff,stroke:#d8d6cf,stroke-width:1px
