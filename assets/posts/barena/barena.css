@@ -11,7 +11,7 @@
 }
 
 .barena-results-figure {
-  width: min(760px, 100%);
+  width: min(620px, 100%);
   margin-right: auto;
   margin-left: auto;
 }
@@ -19,6 +19,58 @@
 .barena-results-figure img {
   width: 100%;
   max-width: 100%;
+}
+
+.barena-results-figure figcaption a {
+  display: inline;
+  line-height: inherit;
+}
+
+.barena-validation-summary {
+  display: grid;
+  width: min(100%, 860px);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1px;
+  margin: 2.2rem 0 2.2rem auto;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--line);
+}
+
+.barena-validation-stat {
+  padding: 1.15rem 1.2rem;
+  background: var(--paper);
+}
+
+.barena-validation-stat-wide {
+  grid-column: 1 / -1;
+  background: var(--paper-strong);
+}
+
+.barena-validation-stat span {
+  display: block;
+  margin-bottom: 0.35rem;
+  color: var(--faint);
+  font: 600 0.7rem/1.4 var(--mono);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.barena-validation-stat strong {
+  display: block;
+  margin-bottom: 0.35rem;
+  font-family: var(--display);
+  font-size: clamp(1.35rem, 3vw, 1.9rem);
+  letter-spacing: -0.045em;
+  line-height: 1.1;
+}
+
+.barena-validation-stat p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.84rem;
+  line-height: 1.65;
 }
 
 @media (max-width: 760px) {
@@ -37,5 +89,15 @@
   .barena-results-figure img {
     width: 100%;
     max-width: 100%;
+  }
+
+  .barena-validation-summary {
+    grid-template-columns: 1fr;
+    margin-right: 0;
+    margin-left: 0;
+  }
+
+  .barena-validation-stat-wide {
+    grid-column: auto;
   }
 }
