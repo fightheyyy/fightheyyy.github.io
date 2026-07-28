@@ -26,6 +26,11 @@
   line-height: inherit;
 }
 
+.article-table-wrap {
+  margin-right: auto;
+  margin-left: auto;
+}
+
 .barena-validation-summary {
   display: grid;
   width: min(100%, 860px);
