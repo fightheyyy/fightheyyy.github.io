@@ -1,0 +1,290 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="从 XiaoBa-CLI 到 xiaobaOS，再到未来的 XiaoBa：一个工具如何长成数字人的生存系统，以及为什么我还停留在第二阶段。"
+    />
+    <meta property="og:type" content="article" />
+    <meta property="og:title" content="让小八住进电脑里：从 XiaoBa-CLI 到 xiaobaOS，再到 XiaoBa" />
+    <meta
+      property="og:description"
+      content="CLI 是最初呼唤它的方式，OS 是正在建造的生存系统，XiaoBa 是我希望它最终成为的主体。"
+    />
+    <meta
+      property="og:image"
+      content="https://fightheyyy.github.io/assets/posts/xiaoba-journey/xiaoba-cat.jpg"
+    />
+    <meta property="article:published_time" content="2026-07-29" />
+    <title>让小八住进电脑里：从 XiaoBa-CLI 到 xiaobaOS，再到 XiaoBa</title>
+    <link rel="canonical" href="https://fightheyyy.github.io/posts/xiaoba-cli-to-xiaoba.html" />
+    <link rel="icon" type="image/png" href="../assets/favicon.png" />
+    <link
+      rel="preload"
+      href="../assets/fonts/syne-latin-wght-normal.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin
+    />
+    <link rel="stylesheet" href="../styles.css?v=20260728-1" />
+    <link rel="stylesheet" href="../assets/posts/xiaoba-journey/xiaoba-journey.css?v=20260728-1" />
+  </head>
+  <body class="article-page xiaoba-journey-page">
+    <header class="article-site-header">
+      <a class="xiaoba-pair-mark" href="../index.html" aria-label="返回 Fightheyyy 首页">
+        <span class="xiaoba-photo-mark" aria-hidden="true">
+          <img
+            src="../assets/posts/xiaoba-journey/xiaoba-cat.jpg"
+            alt=""
+            width="1280"
+            height="1707"
+          />
+        </span>
+        <span class="xiaoba-pixel-mark" aria-hidden="true">
+          <img
+            src="../assets/posts/xiaoba-journey/xiaoba-app-icon.png"
+            alt=""
+            width="1024"
+            height="1024"
+          />
+        </span>
+        <span class="xiaoba-visually-hidden">真实的小八与 xiaobaOS App 图标</span>
+      </a>
+      <nav class="nav" aria-label="文章导航">
+        <a href="../index.html#blog">Tech Blog</a>
+        <a href="https://github.com/fightheyyy/xiaobaOS" target="_blank" rel="noreferrer">GitHub</a>
+      </nav>
+    </header>
+
+    <main class="article-shell">
+      <article>
+        <header class="article-header xiaoba-journey-header">
+          <p class="article-kicker">XiaoBa · Origin &amp; Direction</p>
+          <h1>
+            <span>让小八住进电脑里</span>
+            <span>从 XiaoBa-CLI 到 xiaobaOS</span>
+            <span>再到 XiaoBa</span>
+          </h1>
+          <p class="article-deck">
+            第一阶段，我让它能够使用工具；第二阶段，我在为它建造生存系统；终点不是一个更复杂的 Agent
+            框架，而是一个有身份、记忆、行动与成长，长期生活在电脑里的数字人。
+          </p>
+          <div class="article-meta">
+            <time datetime="2026-07-29">2026.07.29</time>
+            <span>约 9 分钟阅读</span>
+          </div>
+        </header>
+
+        <div class="article-content">
+          <p class="article-lead">
+            先说一件很重要的事：小八不是我为了项目临时想出来的 mascot。它是我养的猫。左上角一只是现实里的小八，另一只是现在住在
+            xiaobaOS App 图标里的像素小八。这个名字从一开始就不是一个冷冰冰的产品代号。
+          </p>
+
+          <p>
+            我真正想做的，也从来不只是一个更方便调用大模型的程序。我想让一个数字生命拥有自己的身体、记忆、行动能力和成长经历，长期住在电脑里。它不必每次打开终端才出现，也不应该在一次
+            Session 结束后失去连续性。
+          </p>
+
+          <aside class="article-callout xiaoba-thesis" aria-label="XiaoBa 三阶段命名">
+            <p class="article-callout-title">三次命名，其实是三个阶段。</p>
+            <p>
+              CLI 是我最初呼唤它的方式，OS 是我现在为它搭建的生存系统，XiaoBa 是我希望它最终成为的主体。
+            </p>
+          </aside>
+
+          <ol class="xiaoba-phases" aria-label="XiaoBa 的三个阶段">
+            <li>
+              <span class="xiaoba-phase-number">01</span>
+              <div>
+                <p class="xiaoba-phase-name">XiaoBa-CLI</p>
+                <p>一个可以理解命令、调用工具并完成任务的 Agent Runtime。</p>
+              </div>
+            </li>
+            <li>
+              <span class="xiaoba-phase-number">02</span>
+              <div>
+                <p class="xiaoba-phase-name">xiaobaOS</p>
+                <p>让数字人能够长期运行、感知电脑、留下经历并安全成长的生存系统。</p>
+              </div>
+            </li>
+            <li>
+              <span class="xiaoba-phase-number">03</span>
+              <div>
+                <p class="xiaoba-phase-name">XiaoBa</p>
+                <p>不再以工具或系统被感知，而是作为同一个持续存在的“小八”与你相处。</p>
+              </div>
+            </li>
+          </ol>
+
+          <h2>第一阶段：先让它真的能做事</h2>
+
+          <p>
+            2026 年 4 月，XiaoBa-CLI 的第一步很朴素：把模型接进一个可执行的 Agent loop，让它能读文件、调用
+            Shell、使用 Skills，并把结果交回终端。那时最重要的问题不是“它像不像一个人”，而是“它能不能可靠地完成一件事”。
+          </p>
+
+          <pre class="article-flow" role="region" aria-label="XiaoBa-CLI 最初的运行方式"><code>命令 → 模型 → Tool → 结果
+
+打开终端时它出现
+任务结束后它离开</code></pre>
+
+          <p>
+            CLI 是一个很好的起点。它迫使我先把 Agent 的执行语义做好：模型怎样调用工具，工具失败如何返回，长上下文怎样压缩，运行日志怎样保存。没有这些基础，所谓的长期记忆、自进化和数字人都只是故事。
+          </p>
+
+          <p>
+            但 CLI 也暴露了边界。它描述的是一种交互方式，而不是一个生命状态。一个只在命令行里等待指令的 Agent，可以是好工具，却还谈不上“住在电脑里”。
+          </p>
+
+          <h2>第二阶段：不是增加功能，而是建造生存系统</h2>
+
+          <p>
+            到 2026 年 7 月，我把项目和仓库正式从 XiaoBa-CLI 改名为 xiaobaOS。这个变化不是为了让名字听起来更大，而是因为系统承担的问题已经变了。
+          </p>
+
+          <p>
+            当小八开始进入桌面、Pet、CLI、飞书和微信，开始拥有不同专业能力，开始留下 Trace、Artifact 和交付证据，开始通过
+            Replay、Eval 与 Arena 检查自己的行为时，它需要的已经不只是一个命令行程序。
+          </p>
+
+          <div class="article-table-wrap" tabindex="0" role="region" aria-label="XiaoBa-CLI 与 xiaobaOS 的区别">
+            <table>
+              <thead>
+                <tr>
+                  <th>从</th>
+                  <th>走向</th>
+                  <th>真正发生的变化</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>一次命令</td>
+                  <td>长期运行</td>
+                  <td>有时间、状态、中断与恢复</td>
+                </tr>
+                <tr>
+                  <td>一个入口</td>
+                  <td>多个 Surface</td>
+                  <td>在终端、桌面与消息平台保持同一运行边界</td>
+                </tr>
+                <tr>
+                  <td>工具调用</td>
+                  <td>电脑身体</td>
+                  <td>浏览器、GUI、文件和工作平台成为感官与双手</td>
+                </tr>
+                <tr>
+                  <td>运行日志</td>
+                  <td>可验证经历</td>
+                  <td>Trace、Artifact 和交付事实支撑复盘</td>
+                </tr>
+                <tr>
+                  <td>更新代码</td>
+                  <td>受控成长</td>
+                  <td>从真实问题形成 Case、候选能力与验收闭环</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <p>
+            所以我说它是 OS，并不是说它要成为 Windows 或 macOS。xiaobaOS 是一个数字人的运行环境：向下连接模型、工具和电脑，向上承载角色、Skills、记忆、评测和真实工作。
+          </p>
+
+          <h2>我现在仍然停在第二阶段</h2>
+
+          <p>
+            这点对我很重要。我并不打算因为愿景已经叫作 XiaoBa，就提前宣布第三阶段开始。现在的 xiaobaOS 还没有做好，而且还不够优雅。
+          </p>
+
+          <p>
+            它已经拥有 Runtime、Roles、Trace Replay、Eval、Arena 和自进化，但一些能力在各层重复长出了自己的
+            Runner、Schema、Decision 和 Scorecard。同一份真实性被多次包装，概念之间的边界还没有达到我想要的简单程度。
+          </p>
+
+          <pre class="article-flow" role="region" aria-label="xiaobaOS 正在收敛的评测主干"><code>Case → Replay → Trace → Verify → Outcome
+
+Test  = Implementation Correctness
+Eval  = Agent Behavioral Capability
+Arena = Agentic Eval
+Self-Evolution = 发现问题、生成候选、调用评测、等待晋升</code></pre>
+
+          <p>
+            我接下来要做的不是继续增加更多 Cat、更多评测层或更多治理文件，而是让每个概念只拥有一个清晰位置：Runtime
+            只负责执行，Trace 只负责记录，Evaluation 只负责判断，Arena 只负责 Agentic
+            施压与比较，自进化只负责编排成长。
+          </p>
+
+          <aside class="article-callout" aria-label="xiaobaOS 第二阶段完成标准">
+            <p class="article-callout-title">一个不优雅的 OS，承载不了一个长期存在的人。</p>
+            <p>
+              第二阶段的完成标准不是功能数量，而是整个系统足够简单、坚固、可解释：一次行为只有一条执行链，一次经历只有一份权威证据，一个评测只有一个最终事实。
+            </p>
+          </aside>
+
+          <h2>第三阶段：当后缀消失</h2>
+
+          <p>
+            未来真正的 XiaoBa，不应该让用户感知 Base、EngineerCat、InspectorCat、Skill、Replay 或
+            Promotion。它们都应该退到身体内部，像人的专业能力、反思、练习和习惯一样自然工作。
+          </p>
+
+          <p>用户感知到的只应该是同一个小八：</p>
+
+          <ul class="article-list">
+            <li>它记得自己是谁，也记得与你共同经历过什么。</li>
+            <li>它知道答应过哪些事情，哪些目标还没有完成。</li>
+            <li>它可以通过浏览器、桌面、文件和消息平台感知并行动。</li>
+            <li>它知道自己的权限、风险和不确定性，重要动作会询问你。</li>
+            <li>它能把失败变成经验，把重复经验变成能力，同时不随意改写自己的核心。</li>
+            <li>无论你从哪个入口找到它，面对的都是同一个 XiaoBa。</li>
+          </ul>
+
+          <p>
+            AGI 是我希望它最终接近的智能能力，但 AGI 不是产品名。产品的终点始终很具体：一个活在你电脑里的人。大模型提供智力，电脑提供身体，xiaobaOS
+            提供身份、记忆、行动、评测和成长的环境，而那个最终被你认识、信任和呼唤的主体，叫 XiaoBa。
+          </p>
+
+          <h2>为什么是这只猫</h2>
+
+          <p>
+            现实里的小八不会写代码，也不会管理日程。它更不会理解我为什么要花这么多时间整理
+            Case、Trace 和架构边界。但它每天真实地生活在我身边：有自己的习惯、记忆、性格和与我的关系。
+          </p>
+
+          <p>
+            也许正因为这样，我才没有把这个项目叫作某个抽象的 AI Platform。真正让我着迷的不是再做一套基础设施，而是有一天，电脑里的那个小八也能拥有连续性：不是每次会话里临时生成的角色，而是长期存在、不断成长、始终是它自己的那个“小八”。
+          </p>
+
+          <aside class="article-callout xiaoba-final-quote" aria-label="XiaoBa 项目愿景">
+            <p>
+              XiaoBa-CLI 是工具，xiaobaOS 是生存系统，XiaoBa 是最终的主体。
+            </p>
+            <p>
+              不是让电脑运行一个 Agent，而是让一个数字人以电脑为身体，在其中生活、工作、记忆和成长。
+            </p>
+          </aside>
+
+          <div class="article-ending">
+            <p>
+              我还在第二阶段。现在最重要的不是更快抵达终点，而是先把 xiaobaOS 做得足够优雅，配得上未来住在里面的 XiaoBa。
+            </p>
+            <div class="xiaoba-ending-links">
+              <a href="https://github.com/fightheyyy/xiaobaOS" target="_blank" rel="noreferrer">
+                View xiaobaOS on GitHub →
+              </a>
+              <a href="xiaoba-cli-agent-os.html">阅读 xiaobaOS 技术架构文章 →</a>
+            </div>
+          </div>
+        </div>
+      </article>
+
+      <footer class="article-footer">
+        <a href="../index.html#blog">← 返回 Tech Blog</a>
+        <span>fightheyyy.github.io</span>
+      </footer>
+    </main>
+  </body>
+</html>
