@@ -1,0 +1,171 @@
+.catena-thesis {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1px;
+  margin: 2.4rem 0;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--line);
+}
+
+.catena-thesis-item {
+  min-width: 0;
+  padding: 1.25rem;
+  background: var(--paper);
+}
+
+.catena-thesis-item span {
+  display: block;
+  margin-bottom: 0.55rem;
+  color: var(--faint);
+  font: 650 0.68rem/1.3 var(--mono);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.catena-thesis-item strong {
+  display: block;
+  font-family: var(--display);
+  font-size: clamp(1rem, 2vw, 1.2rem);
+  letter-spacing: -0.035em;
+  line-height: 1.3;
+}
+
+.catena-boundary {
+  display: grid;
+  width: min(1080px, calc(100vw - 64px));
+  grid-template-columns: minmax(0, 1fr) 150px minmax(0, 1fr);
+  align-items: stretch;
+  gap: 1rem;
+  margin: 2.8rem 0 2.8rem 50%;
+  transform: translateX(-50%);
+}
+
+.catena-zone {
+  padding: 1.4rem;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--paper);
+}
+
+.catena-zone-cloud {
+  background: var(--paper-strong);
+}
+
+.catena-zone-label {
+  margin: 0 0 1rem;
+  color: var(--faint);
+  font: 650 0.68rem/1.3 var(--mono);
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+}
+
+.catena-node {
+  padding: 0.9rem 1rem;
+  border-top: 1px solid var(--line);
+}
+
+.catena-node:first-of-type {
+  border-top: 0;
+}
+
+.catena-node strong,
+.catena-node span {
+  display: block;
+}
+
+.catena-node strong {
+  margin-bottom: 0.18rem;
+  font-size: 0.9rem;
+}
+
+.catena-node span {
+  color: var(--muted);
+  font-size: 0.76rem;
+  line-height: 1.55;
+}
+
+.catena-transfer {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.8rem;
+  color: var(--muted);
+  text-align: center;
+}
+
+.catena-transfer::before {
+  width: 100%;
+  height: 1px;
+  background: var(--line-strong);
+  content: "";
+}
+
+.catena-transfer strong {
+  color: var(--text);
+  font: 650 0.68rem/1.5 var(--mono);
+}
+
+.catena-transfer span {
+  font-size: 1.4rem;
+  line-height: 1;
+}
+
+.catena-two-paths {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+  margin: 2rem 0;
+}
+
+.catena-path {
+  padding: 1.2rem;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--paper);
+}
+
+.catena-path code {
+  display: block;
+  margin-bottom: 0.7rem;
+  color: var(--text);
+  font-size: 0.72rem;
+  white-space: normal;
+}
+
+.catena-path p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.82rem;
+}
+
+@media (max-width: 760px) {
+  .catena-thesis,
+  .catena-two-paths {
+    grid-template-columns: 1fr;
+  }
+
+  .catena-boundary {
+    width: 100%;
+    grid-template-columns: 1fr;
+    margin-right: 0;
+    margin-left: 0;
+    transform: none;
+  }
+
+  .catena-transfer {
+    flex-direction: row;
+  }
+
+  .catena-transfer::before {
+    width: 1px;
+    height: 2.4rem;
+  }
+
+  .catena-transfer span {
+    transform: rotate(90deg);
+  }
+}

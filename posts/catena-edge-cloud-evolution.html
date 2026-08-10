@@ -1,0 +1,350 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="Catena 为什么把 Agent 持续进化拆成端和云：端侧运行真实 Agent 与回归验证，云端消费 OTLP Trace 和对话，从跨 Run 证据中生成可追溯的 Agent 资产。"
+    />
+    <meta property="og:type" content="article" />
+    <meta property="og:title" content="Catena：我为什么把 Agent 进化拆成端和云" />
+    <meta
+      property="og:description"
+      content="目标 Agent 留在用户环境，Catena 云端只消费证据。Trace 是燃料，本地验证决定一次改进能否真的进入 Agent。"
+    />
+    <meta property="article:published_time" content="2026-08-11" />
+    <title>Catena：我为什么把 Agent 进化拆成端和云</title>
+    <link rel="canonical" href="https://fightheyyy.github.io/posts/catena-edge-cloud-evolution.html" />
+    <link rel="icon" type="image/png" href="../assets/favicon.png" />
+    <link
+      rel="preload"
+      href="../assets/fonts/syne-latin-wght-normal.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin
+    />
+    <link rel="stylesheet" href="../styles.css?v=20260717-8" />
+    <link rel="stylesheet" href="../assets/posts/catena/catena.css?v=20260811-1" />
+  </head>
+  <body class="article-page">
+    <header class="article-site-header">
+      <a class="name article-name-mark" href="../index.html" aria-label="Fightheyyy">
+        <span class="article-name-stem" aria-hidden="true">Fighthe</span>
+        <span class="article-name-tail" aria-hidden="true">yyy</span>
+      </a>
+      <nav class="nav" aria-label="文章导航">
+        <a href="../index.html#blog">Tech Blog</a>
+        <a href="https://github.com/fightheyyy/CATENA" target="_blank" rel="noreferrer">GitHub</a>
+      </nav>
+    </header>
+
+    <main class="article-shell">
+      <article>
+        <header class="article-header">
+          <p class="article-kicker">Agent Infrastructure · Edge / Cloud</p>
+          <h1 aria-label="Catena：我为什么把 Agent 进化拆成端和云">
+            <span>Catena：</span>
+            <span>我为什么把 Agent 进化</span>
+            <span>拆成端和云</span>
+          </h1>
+          <p class="article-deck">
+            端侧运行真正的 Agent，云端长期消费 Trace；平台从重复行为中提出改进，本地回归决定它能不能被采用。端云协同不是部署形式，而是 Agent 进化必须遵守的证据边界。
+          </p>
+          <div class="article-meta">
+            <time datetime="2026-08-11">2026.08.11</time>
+            <span>约 14 分钟阅读</span>
+          </div>
+        </header>
+
+        <div class="article-content">
+          <p class="article-lead">
+            Catena 并不是从“我要做一个云平台”开始的。它最早只是 Barena 旁边不断长出来的问题：Agent 在本地被测试，Trace 也在本地，为什么还需要云；如果一切搬到云端，平台又凭什么运行每个人电脑里的 Codex、XiaoBaOS、Claude Code 和各种 Claw？
+          </p>
+
+          <p>
+            我在这两个方向之间来回摇摆了很久。做成纯本地工具，证据会随着一次 Run 结束而消失，跨天、跨版本的重复问题很难被看见；做成托管 Runtime，平台必须接管用户代码、文件、密钥和执行环境，成本与信任边界都会立刻失控。
+          </p>
+
+          <p>
+            最后让我停止加功能的不是某个新框架，而是一条很朴素的边界：<strong>执行属于端，证据属于云；建议可以在云上生成，改变必须回到端上验证。</strong>
+          </p>
+
+          <div class="catena-thesis" aria-label="Catena 的三个边界判断">
+            <div class="catena-thesis-item">
+              <span>Execution</span>
+              <strong>目标 Agent 留在用户环境</strong>
+            </div>
+            <div class="catena-thesis-item">
+              <span>Evidence</span>
+              <strong>Trace 与对话进入长期事实层</strong>
+            </div>
+            <div class="catena-thesis-item">
+              <span>Evolution</span>
+              <strong>候选在云上产生，变化在端上验证</strong>
+            </div>
+          </div>
+
+          <h2>一开始，我把三个不同的问题混在了一起</h2>
+
+          <p>
+            第一个问题是观测：Agent 刚才到底调用了什么模型、哪个工具、在哪一步失败。第二个问题是评测：给它一个任务，它是否真的完成。第三个问题才是进化：一段时间里反复出现的失败，应该沉淀成什么，并且怎样进入下一版 Agent。
+          </p>
+
+          <div class="article-table-wrap" tabindex="0" role="region" aria-label="Agent 观测、评测和进化的区别">
+            <table>
+              <thead>
+                <tr>
+                  <th>层次</th>
+                  <th>回答的问题</th>
+                  <th>产物</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Observability</td>
+                  <td>这一次运行发生了什么？</td>
+                  <td>Trace、Span、错误、耗时</td>
+                </tr>
+                <tr>
+                  <td>Evaluation</td>
+                  <td>目标任务有没有真实完成？</td>
+                  <td>Case、Verifier、回归结论</td>
+                </tr>
+                <tr>
+                  <td>Evolution</td>
+                  <td>重复问题应该怎样改变 Agent？</td>
+                  <td>agent.md、Skill、Role、Harness</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <p>
+            只做第一层，Catena 会变成又一个 Trace Viewer；只做第二层，它和 Barena 的职责会重叠；直接跳到第三层，又会得到一堆没有证据来源的“优化建议”。所以平台真正需要保存的不是漂亮的总结，而是从原始运行到候选改动之间的链条。
+          </p>
+
+          <aside class="article-callout" aria-label="Catena 的产品判断">
+            <p class="article-callout-title">Trace 不是产品，它只是燃料。</p>
+            <p>
+              产品价值发生在 Trace 被按 Agent 和时间重新组织之后：重复失败被识别，问题被沉淀成 Case，通用行为进入 agent.md、Skill 或 Role，Runtime 级问题进入 Harness，然后再次被真实执行验证。
+            </p>
+          </aside>
+
+          <h2>为什么不能把目标 Agent 直接放进云端</h2>
+
+          <p>
+            对一个标准 HTTP Agent，云端 Scenario Runner 确实可以直接调用 Endpoint。但真实开发环境远比这个模型复杂：Codex 需要本地仓库与终端，Claude Code 依赖开发者机器上的权限，XiaoBaOS 连接飞书、微信和用户自己的 Skills，Claw 还可能操作浏览器、桌面或内网资源。
+          </p>
+
+          <p>
+            如果 Catena 为了“统一接入”去复刻这些 Runtime，它很快会变成远程开发环境、密钥托管平台和容器调度系统的混合体。平台不仅变重，还改变了被测对象：在云端沙箱里跑通的 Agent，并不等于用户机器上的那个 Agent。
+          </p>
+
+          <p>
+            因此 Catena 不内置被测 Agent Runtime。XiaoBaOS、Codex、Claude Code 或任意 Claw 继续在它们原本的环境运行。平台内置的 XiaoBaOS Evolution Runtime 只读取 Evidence Pack，负责分析证据，不替用户执行任务。
+          </p>
+
+          <h2>为什么也不能把一切留在本地</h2>
+
+          <p>
+            纯本地模式有另一种局限。一次 E2E 测试可以告诉我“这次失败了”，却很难回答“这个失败在过去一个月出现过多少次”“它只影响某个 Skill，还是多个 Agent 都会发生”“修复之后，旧问题有没有回来”。这些问题需要长期事实，而不是一次命令结束时生成的报告。
+          </p>
+
+          <p>
+            更重要的是，进化并不总是从测试开始。用户真实使用 Agent 时产生的 Trace，往往比预先设计的 Case 更早暴露边界。云端适合做的正是这种跨 Run 工作：长期保存、按 Agent 聚合、冻结时间窗口、比较重复模式，并让候选产物保留来源。
+          </p>
+
+          <h2>最终边界：端上执行，云上积累，再回端验证</h2>
+
+          <section class="catena-boundary" aria-label="Catena 端云协同架构">
+            <div class="catena-zone">
+              <p class="catena-zone-label">Edge · 用户环境 / CI</p>
+              <div class="catena-node">
+                <strong>目标 Agent</strong>
+                <span>XiaoBaOS · Codex · Claude Code · Claw</span>
+              </div>
+              <div class="catena-node">
+                <strong>Barena E2E Engine</strong>
+                <span>模拟用户探索 · Case 回放 · 版本对比 · Verifier</span>
+              </div>
+              <div class="catena-node">
+                <strong>当前 Run 证据</strong>
+                <span>OTLP Trace · Artifact · Run Bundle</span>
+              </div>
+            </div>
+
+            <div class="catena-transfer" aria-label="证据由端上传到云，候选返回端验证">
+              <strong>OTLP / HTTPS<br />Evidence &rarr;<br />&larr; Candidate</strong>
+              <span aria-hidden="true">→</span>
+            </div>
+
+            <div class="catena-zone catena-zone-cloud">
+              <p class="catena-zone-label">Cloud · Catena</p>
+              <div class="catena-node">
+                <strong>Go Control Plane</strong>
+                <span>身份 · Agent · API Key · Job · 审计</span>
+              </div>
+              <div class="catena-node">
+                <strong>Evidence Store</strong>
+                <span>PostgreSQL 业务事实 · ClickHouse Span</span>
+              </div>
+              <div class="catena-node">
+                <strong>Evolution Runtime</strong>
+                <span>发现问题 · 生成候选 · 证据评审</span>
+              </div>
+            </div>
+          </section>
+
+          <pre class="article-flow" role="region" aria-label="Catena 持续进化闭环"><code>真实使用 / E2E Run
+        ↓
+OTLP Trace + Conversation + Run Bundle
+        ↓
+按 Agent 与时间窗口冻结 Evidence
+        ↓
+发现重复问题 → 生成候选资产 → 证据评审
+        ↓
+agent.md / Skill / Role / Harness
+        ↓
+回到本地 Replay 与 Verifier
+        ↓
+采用、拒绝，或继续观察</code></pre>
+
+          <p>
+            这条链路里没有“云端自动宣布自己优化成功”。模型可以提出修改，评审 Agent 可以解释理由，但只有目标环境里的 Replay 和确定性 Verifier 才能证明行为真的改变。把生成与验证分开，是为了防止进化系统变成模型自己给自己打分。
+          </p>
+
+          <h2>OpenTelemetry 统一的是证据，不是 Agent</h2>
+
+          <p>
+            我最初担心跨 Runtime 接入会变成无穷无尽的 Adapter：Codex 一套、Claude Code 一套、XiaoBaOS 又一套。OpenTelemetry 解决了其中最重的一部分——模型调用、工具调用、耗时和错误可以通过 OTLP 进入同一个证据入口。
+          </p>
+
+          <p>
+            但 OTel 并没有消灭 Runtime 差异。真正执行 E2E 时，仍然需要知道怎样启动 Agent、怎样续接 Session、怎样取消任务、怎样取得 Artifact。于是 Catena 与 Barena 分别统一不同层次：Catena 用 OTLP 统一长期证据，Barena 用 Agent Adapter 统一端侧执行。
+          </p>
+
+          <div class="catena-two-paths" aria-label="Catena 的两类统一协议">
+            <div class="catena-path">
+              <code>Runtime → OTLP → Catena</code>
+              <p>统一观测和跨 Run 分析，不要求平台理解每个 Runtime 的启动方式。</p>
+            </div>
+            <div class="catena-path">
+              <code>Barena → Agent Adapter → Runtime</code>
+              <p>统一 Explore、Replay、Compare 和取消语义，保留本地执行能力。</p>
+            </div>
+          </div>
+
+          <h2>Trace 和对话是两种不同的事实</h2>
+
+          <p>
+            做 XiaoBaOS 接入时，我又犯过一次“所有东西都放进 Trace”的错误。Trace 适合回答工具调用、异常恢复、模型耗时和 Runtime 行为；但 XiaoBaOS 是一个长期存在于 IM 里的工作同事，用户真正经历的是自己发出的消息，以及最终成功送达的文本或文件。
+          </p>
+
+          <p>
+            隐藏 Prompt、思考过程、失败重试和 Tool Result 不应该被当作共同经历写进长期记忆。Catena 因此保留了两条事实路径：Trace 用来改工程行为，对话用来形成记忆与角色知识。
+          </p>
+
+          <pre class="article-flow" role="region" aria-label="Catena 的 Trace 与 Conversation 路径"><code>OTLP Trace
+  → Tool / Runtime / Harness 分析
+  → agent.md · Skill · Role · Harness
+
+User-visible Conversation
+  → GauzMem 记忆编译
+  → semantic · graph · temporal memory</code></pre>
+
+          <p>
+            这不是同一份数据的两种展示，而是两种权威来源。工程系统看到的事实和用户经历的事实必须分开，否则“模型尝试发送”很容易被误记成“用户已经收到”。
+          </p>
+
+          <h2>Agent 身份不能依赖上传方随便填写</h2>
+
+          <p>
+            一个云平台支持多个 Agent 后，最先遇到的不是 Trace 数量，而是归属问题。同一台电脑可能同时出现 <code>codex-app-server</code> 和 <code>Codex Desktop</code>，服务名也可能随版本变化。如果把 <code>service.name</code> 直接当作 Agent，用户会看到一堆自己并不认识的“Agent”。
+          </p>
+
+          <p>
+            Catena 改成先创建 Agent，再生成与它绑定的 API Key。上传时，Key 决定稳定的 <code>agent_id</code>；Runtime 类型从证据自动识别，只作为展示信息，客户端不能靠改 payload 把数据写到另一个 Agent 名下。
+          </p>
+
+          <pre class="article-flow" role="region" aria-label="Catena Agent 身份绑定"><code>Agent name
+    ↓
+agent_id + Agent API Key
+    ↓
+OTLP / Conversation upload
+    ↓
+Key ownership overrides payload identity
+    ↓
+Runtime auto-detection + canonical Agent view</code></pre>
+
+          <p>
+            这个看似普通的交互调整，实际上确定了多用户平台的数据边界：Agent 是用户主动管理的业务对象，Telemetry Source 只是它的证据来源。
+          </p>
+
+          <h2>为什么最后重写了平台，而不是继续魔改</h2>
+
+          <p>
+            Catena 的早期版本借用了成熟可观测平台的产品骨架。我原本以为隐藏几个菜单、改一下首页，就能快速得到需要的东西。真正使用后才发现问题不是页面数量，而是对象模型不同：通用 LLM Observability 围绕 Trace、Prompt、Dataset 展开，Catena 围绕 Agent、Evidence、Evolution Job 和 Candidate 展开。
+          </p>
+
+          <p>
+            继续隐藏功能会留下越来越多不可解释的入口，后端也必须维护并不属于 Catena 的概念。最终我保留了从这些开源项目中学到的 Trace 交互和端云模式，但把产品重写成自己的 Go 控制面与 React 前端：Go 负责 OAuth、Agent API Key、OTLP、任务状态和租户边界；PostgreSQL 保存业务事实，官方 ClickHouse 保存 Span；Evolution Runner 与数据库都留在私有网络。
+          </p>
+
+          <p>
+            重写不是为了证明“什么都能自己造”，而是因为继续复用的适配成本已经超过了自己拥有清晰边界的成本。MVP1 最终只保留 Agent、对话、记忆、Trace、Trace Farm 和 API 管理六个核心入口。
+          </p>
+
+          <h2>云端进化到底产出什么</h2>
+
+          <p>
+            我不再把进化理解成“一条 Trace 生成一份建议”。单条 Trace 适合诊断和 Replay，进化必须从同一个 Agent 的多条运行中寻找重复模式。Catena 会先冻结 Agent 与时间窗口形成不可变 Trace Set，再经历问题发现、候选生成和证据评审三个阶段。
+          </p>
+
+          <ul class="article-list">
+            <li><strong>agent.md</strong>：跨任务都成立的行为约束与工作方式。</li>
+            <li><strong>Skill</strong>：可以复用到其他 Agent 的特定能力与流程。</li>
+            <li><strong>Role</strong>：稳定的职责、边界和领域工作方法。</li>
+            <li><strong>Harness</strong>：只在 XiaoBaOS 上生成的 Runtime 代码改动，回到隔离环境验证后应用。</li>
+            <li><strong>Case</strong>：从失败中沉淀的固定回归输入，保护已经发现的边界。</li>
+          </ul>
+
+          <p>
+            这些资产都必须保留来源 Trace。没有来源的 Prompt 改写只是灵感；有来源、有回放、有 Verifier，才有机会成为工程变化。
+          </p>
+
+          <h2>MVP1 刻意没有解决什么</h2>
+
+          <p>
+            Catena 当前是 single-node Beta，而不是已经包装好的企业 SaaS。它还没有多 Worker lease、崩溃恢复、组织级 RBAC、配额和多节点调度；候选资产也不会未经批准自动发布到 SkillHub 或 RoleHub。
+          </p>
+
+          <p>
+            这些限制是主动留下的。对 MVP1 来说，最重要的是证明闭环可以工作：任意 OTel Agent 能接入，真实证据能被长期组织，跨 Run 问题能形成候选，候选能够回到本地验证。可靠队列和组织治理是下一阶段的后端问题，不应该在产品边界尚未确定时提前堆进去。
+          </p>
+
+          <aside class="article-callout" aria-label="Catena 的最终判断">
+            <p class="article-callout-title">持续进化不是云端替 Agent 改代码，而是一条证据回路。</p>
+            <p>
+              端侧保留真实环境和最终验证权，云端提供长期记忆、跨 Run 视野与共享计算。两边通过标准证据协议连接，任何改进都必须能回到来源，也必须能回到执行环境重新证明。
+            </p>
+          </aside>
+
+          <div class="article-ending">
+            <p>
+              Catena MVP1 已经开源并完成公开单机部署。它目前还很小，但边界已经稳定：端上运行，云上积累；Trace 是燃料，验证决定变化。
+            </p>
+            <a href="https://github.com/fightheyyy/CATENA" target="_blank" rel="noreferrer">
+              View Catena on GitHub →
+            </a>
+          </div>
+        </div>
+      </article>
+
+      <footer class="article-footer">
+        <a href="../index.html#blog">← 返回 Tech Blog</a>
+        <span>fightheyyy.github.io</span>
+      </footer>
+    </main>
+  </body>
+</html>
