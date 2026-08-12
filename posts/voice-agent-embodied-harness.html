@@ -1,0 +1,333 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="一次具身 Voice Agent 接入复盘：从 ARM 板上的 ROS2 音频闭环，到 CPU 卡顿、边缘计算板分体、跨板 DDS 排查、机器狗双阶段决策与端到端评测。"
+    />
+    <meta property="og:type" content="article" />
+    <meta property="og:title" content="从 Voice Agent 到具身 Agent：一套 Harness 的真机演进记录" />
+    <meta
+      property="og:description"
+      content="架构不是一开始画出来的，而是在声道选错、音频卡顿、跨板超时和真机误判中逐步收敛出来的。"
+    />
+    <meta property="article:published_time" content="2026-08-12" />
+    <title>从 Voice Agent 到具身 Agent：一套 Harness 的真机演进记录</title>
+    <link rel="canonical" href="https://fightheyyy.github.io/posts/voice-agent-embodied-harness.html" />
+    <link rel="icon" type="image/png" href="../assets/favicon.png" />
+    <link
+      rel="preload"
+      href="../assets/fonts/syne-latin-wght-normal.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin
+    />
+    <link rel="stylesheet" href="../styles.css?v=20260717-8" />
+  </head>
+  <body class="article-page">
+    <header class="article-site-header">
+      <a class="name article-name-mark" href="../index.html" aria-label="Fightheyyy">
+        <span class="article-name-stem" aria-hidden="true">Fighthe</span>
+        <span class="article-name-tail" aria-hidden="true">yyy</span>
+      </a>
+      <nav class="nav" aria-label="文章导航">
+        <a href="../index.html#blog">Tech Blog</a>
+        <a href="../index.html#projects">Projects</a>
+        <a href="https://github.com/fightheyyy" target="_blank" rel="noreferrer">GitHub</a>
+      </nav>
+    </header>
+
+    <main class="article-shell">
+      <article>
+        <header class="article-header">
+          <p class="article-kicker">Voice Agent · Embodied Systems</p>
+          <h1 aria-label="从 Voice Agent 到具身 Agent：一套 Harness 的真机演进记录">
+            <span>从 Voice Agent 到具身 Agent：</span>
+            <span>一套 Harness 的</span>
+            <span>真机演进记录</span>
+          </h1>
+          <p class="article-deck">
+            这套架构不是一开始设计出来的。它经历了声道选错、同板 CPU 争抢、播放卡顿、跨板 ROS2 超时和部署边界反复调整，才逐步收敛成今天的样子。
+          </p>
+          <div class="article-meta">
+            <time datetime="2026-08-12">2026.08.12</time>
+            <span>约 18 分钟阅读</span>
+          </div>
+        </header>
+
+        <div class="article-content">
+          <p class="article-lead">
+            我接手这个项目时，LiveKit 和基础 Voice Agent 链路已经存在。我的任务很直接：把几类机器人接进现有语音系统，接通音视频输入与输出，再把动作、表情、音量和巡场等能力封装成 Agent 可以调用的 Tool。
+          </p>
+
+          <p>
+            一开始我也把它理解成设备适配：找到 ROS2 Topic 或 Service，做一层转换，跑通即可。但真机接入很快让我发现，能发出声音只代表 Demo 成立；要让它持续工作，还要处理声道、实时调度、设备状态、跨板通信、启动顺序和评测口径。这篇文章按实际发生的顺序，记录这套 Harness 是怎样从问题中长出来的。
+          </p>
+
+          <p>
+            全文包含两条实际工作线：前半部分是一个机器人从接入到算力分体的连续调试过程；后半部分是另一台机器狗的视觉决策与整套语音链路的评测工作。它们共享同一套 Harness，但不是同一次故障的顺序延伸。
+          </p>
+
+          <h2>第一步不是画架构，而是在真机上找接口</h2>
+
+          <p>
+            第一台设备是一块 8 核 ARM、约 8GB 内存的机器人原板。厂商 SDK 提供了 ROS2 麦克风采集、PCM 播放、音量和动作等接口，摄像头则同时提供单帧服务与 RTSP。最初的路线是在机器人本机启动 LiveKit、Agent、设备 sidecar 和一个无浏览器房间，让开发机只负责远程管理。
+          </p>
+
+          <pre class="article-flow" role="region" aria-label="机器人初版同板链路"><code>ROS2 Mic Capture ──→ LiveKit Audio Track ──→ Agent
+                                               │
+ROS2 Motion / Volume ←── Tool Adapter ←────────┤
+                                               ↓
+ROS2 PCM Playback ←── Agent Audio Track ───────┘
+
+LiveKit · Agent · Sidecar · Headless · CV initially ran on the device board</code></pre>
+
+          <p>
+            这一步并不顺。最早监听到的音频几乎全是静音，我一度怀疑 ROS2 采集或 LiveKit 发布有问题。后来直接比较两个声道，发现输入是 16kHz 双声道：ch0 能看到明显的人声峰值，ch1 的 peak 几乎只有 1。真正的问题只是选错了声道。切到 ch0 后，日志出现 Agent Session 启动、音频输入切换和 24kHz 单声道播放块，真机也第一次完整地“听到人说话并用自己的扬声器回答”。
+          </p>
+
+          <p>
+            这次排查给我的第一个教训很朴素：先验证物理输入，再验证协议转换，最后才看模型。否则一个声道问题也会被误判成 ASR、网络或 Agent 故障。
+          </p>
+
+          <h2>闭环跑通后，CPU 问题才真正出现</h2>
+
+          <p>
+            语音闭环跑通并不等于实时可用。为了让 Agent 自动入房，早期 headless 链路会持续发布一条 24kHz 单声道静音 Track：20ms 一帧，每秒 50 帧。当时相关 headless 进程的 CPU 快照约为 35%–37%；这是进程级观测，不能把全部开销都归因于静音 Track。再叠加相机、人脸、sidecar、Agent 和机器人原厂运控进程，板子开始出现明显的调度压力。
+          </p>
+
+          <p>
+            我先取消了依赖“假麦克风”触发 Agent 的方式；纯语音模式下也不再启动不需要的 camera worker。后续 headless 启动收敛为 room config 触发，显式 dispatch 只作为可选路径。这样体感有所改善，但没有解决人脸、动作和播放同时发生时的偶发卡顿。
+          </p>
+
+          <p>
+            一次现场测试里，人脸事件在 13:54:30 左右进入，Agent 随后开始说话，13:54:32 又触发了动作。播放端每 200ms 写一个 PCM chunk，10 个 chunk 理论上约 2.0 秒；那一段从第 140 个到第 150 个 chunk 实际花了约 2.396 秒，之后才恢复到约 2.0 秒。与此同时，8 核板的 load 到过 9.70，机器人原厂运控、相机、ROS 代理和我们自己的 sidecar、Agent、CV 都在争用 CPU。
+          </p>
+
+          <aside class="article-callout" aria-label="卡顿定位结论">
+            <p class="article-callout-title">这不是“模型太慢”，也不是内存不够。</p>
+            <p>
+              内存仍有明显余量，日志里也没有一个可以解释全部现象的单点异常；麦克风发布曾出现超时，扬声器播放也出现了分块间隔抖动。更谨慎的判断是：同板资源竞争同时放大了输入背压和输出播放抖动，实时预算已经不够稳定。
+            </p>
+          </aside>
+
+          <p>
+            当时并没有完善的跨进程 Trace 自动给出根因。我实际依赖的是按时间对齐 camera、Agent、sidecar 日志，再配合 CPU 快照和音频 chunk 间隔缩小范围。这种方法不漂亮，但它能区分“模型还没生成”“音频已生成但没有发布”和“已经播放但时间间隔抖动”三类完全不同的问题。
+          </p>
+
+          <h2>加入高算力边缘板：第一次拆分没有一步到位</h2>
+
+          <p>
+            5 月 12 日，我们增加了一块高算力边缘板。最初的想法是：机器人原板保留视频采集、音频收发和机器人控制，边缘板运行 LiveKit、Agent、CV 与人脸识别。两块板通过千兆网线直连，基础 RTT 约 0.4–0.6ms。这可以排除物理链路时延过高，但不能排除 DDS 发现、Client 生命周期或应用层数据路径问题。
+          </p>
+
+          <pre class="article-flow" role="region" aria-label="边缘计算分体第一阶段"><code>Robot Device Board
+ROS2 Mic / Speaker / Motion · Sidecar · Camera RTSP
+                │
+                │ LiveKit Audio / Data + RTSP
+                ↓
+Edge Compute Board
+LiveKit · Agent · Headless · CV / Face Recognition
+                │
+                ↓
+External Model / Recognition Services</code></pre>
+
+          <p>
+            第一次分体启动就失败了。边缘板上的 LiveKit 退出后，原板 sidecar 先报 connection refused；服务重新起来后，旧 token 又变成 401。我们把 LiveKit 改为普通模式并统一两端认证配置，清掉旧房间状态，再依次重启两侧服务，语音链路才重新恢复。现场测试通过后，才继续把 CV 迁到边缘板：原板只输出厂商 RTSP，边缘板拉流并运行 OpenCV、MediaPipe 与识别逻辑，最终向房间发布结构化人脸事件。
+          </p>
+
+          <p>
+            这里还有第二个反例。换到更强的板并不会自动修复错误的数据路径。为了调试视频，我们曾走过“HTTP 轮询 JPEG → base64/JSON 解码 → Python 转帧 → VP8 发布”的链路；目标设为 25fps 时，发布进程约占 113% CPU，检测 worker 约 78%，实际只有约 11.1fps。只停止调试视频 publisher，对应负载立即消失。算力分体解决的是隔离，不是让低效管道变得合理。
+          </p>
+
+          <h2>一次跨板 ROS2 超时：Client 生命周期是可复现因素</h2>
+
+          <p>
+            接下来最大的争议是：机器人输出和控制到底应该留在原板，还是也搬到边缘板？第一轮测试里，边缘板调用音频焦点服务偶发 8 秒超时。我们一度认为跨板 ROS2/DDS 不够稳定，因此在原板保留一个自研 HTTP gateway，让边缘板通过 HTTP 调用本地 ROS2。
+          </p>
+
+          <p>
+            但这只是一个中间结论。继续排查后发现，计算板上还混用了两份不一致的厂商 ROS2 message package。清掉不完整版本、只使用从硬件板同步的消息定义后，我们又针对音频焦点做了两组对照实验：
+          </p>
+
+          <div class="article-table-wrap" tabindex="0" role="region" aria-label="ROS2 Client 生命周期对照实验">
+            <table>
+              <thead>
+                <tr>
+                  <th>调用方式</th>
+                  <th>申请音频焦点</th>
+                  <th>释放音频焦点</th>
+                  <th>结果</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>复用长连接 Client</td>
+                  <td>20 / 20</td>
+                  <td>20 / 20</td>
+                  <td>0 失败，约 2–4ms</td>
+                </tr>
+                <tr>
+                  <td>每次动态创建 Client</td>
+                  <td>17 / 20</td>
+                  <td>15 / 20</td>
+                  <td>申请 3 次、释放 5 次出现 8s timeout</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <p>
+            这组实验推翻了“服务本身不稳定”以及“网线不稳定”的猜测。一个可以稳定复现的根因是：跨板环境下，刚创建的 DDS Client 虽然已经发现服务，匹配过程仍可能没有完全稳定；马上发请求就会偶发超时。音频播放模块本来就会复用 Client，需要修改的是音量、静音和动作控制里每次调用都动态创建 Client 的通用实现。
+          </p>
+
+          <p>
+            最终我们为这些 Service Client 加了缓存并长期复用，随后删除原板上的自研 gateway。所有自己的程序集中部署到边缘板；原板只保留厂商原有的 RTSP、ROS2 HAL、运动与音量 Service 以及显示服务。无浏览器真机链路完成了人工端到端验证，设备适配与控制相关的聚焦代码回归为 149 passed。
+          </p>
+
+          <pre class="article-flow" role="region" aria-label="最终部署边界"><code>Device Board: Vendor Hardware Runtime Only
+RTSP · ROS2 Audio HAL · Motion / Volume · Display
+                │
+RTSP + long-lived ROS2 clients + vendor display HTTP
+                ↓
+Edge Board: All Custom Services
+Room Input · LiveKit · Agent · CV · Output · Headless
+                │
+                ↓
+External ASR / LLM / TTS / Recognition / Memory</code></pre>
+
+          <p>
+            这也不是“彻底解决”。端测后仍然看到一次可自动恢复的 Realtime idle timeout；某次动作因为机器人状态不满足前置条件而失败；人脸问候还会等待约 5 秒的记忆召回，导致动作已经完成、语音才开始。这些问题没有被藏在“验证通过”下面，而是被留成后续独立问题。
+          </p>
+
+          <h2>Tool 成功需要区分哪些事实</h2>
+
+          <p>
+            真机调试之后，我把具身 Tool 的成功语义事后抽象成下面三层。它是由故障总结出的目标语义，不是当时已经统一落地的状态机。HTTP 200 只能证明请求到达；厂商接口返回 accepted，只能证明命令被接收。机器人还可能因为当前运动模式不允许、资源被占用或执行超时而没有真正做完。
+          </p>
+
+          <div class="article-table-wrap" tabindex="0" role="region" aria-label="具身 Tool 的事实层次">
+            <table>
+              <thead>
+                <tr>
+                  <th>事实层次</th>
+                  <th>能证明什么</th>
+                  <th>仍然不能证明什么</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Accepted</td>
+                  <td>设备控制层接收了合法请求</td>
+                  <td>动作已经开始</td>
+                </tr>
+                <tr>
+                  <td>Started</td>
+                  <td>机器人进入目标执行状态</td>
+                  <td>任务最终完成</td>
+                </tr>
+                <tr>
+                  <td>Completed</td>
+                  <td>设备状态满足业务目标</td>
+                  <td>后续不会被新任务打断</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <p>
+            当前并不是所有设备接口都实现了统一的三级状态机；部分接口只能稳定返回 Accepted，Started 与 Completed 仍需结合设备状态查询。这是这次项目暴露出的设计约束，而不是我已经完成的全平台能力。
+          </p>
+
+          <h2>机器狗巡场：把“可能看到了”和“可以结束”拆开</h2>
+
+          <p>
+            另一条设备链路是低视角机器狗巡场。它会持续移动并观察画面，当发现目标时停车。最初把“发现候选”和“宣布完成”都交给一次视觉判断，很难同时保证召回和低误停。因此运行时被拆成两阶段：VLM1 负责 <code>continue / stop</code> 候选检测；连续两帧认为需要停下后，机器人停车并重新取帧，再由 VLM2 判断 <code>resume / finish</code>。
+          </p>
+
+          <pre class="article-flow" role="region" aria-label="机器狗 Candidate 与 Verifier 决策"><code>Patrol Frame
+      ↓
+VLM1 Candidate Detector ── continue ──→ Keep Moving
+      │ two consecutive stop votes
+      ↓
+Stop + Capture Fresh Frame
+      ↓
+VLM2 Finish Verifier
+   ↙              ↘
+finish            resume</code></pre>
+
+          <p>
+            为了验证这条链路，我让机器狗走完办公室并按固定频率取帧，构建了 1040 条真实低视角样本，再用 GPT-5.5 生成参考标签，以 Gemma4:e4b 作为端侧被测模型。评测分别统计停止候选检测、结束确认和最终巡场决策；经过 Prompt 与级联策略调整，最终巡场决策准确率达到 84.0%，平均决策延迟为 0.88s。
+          </p>
+
+          <p>
+            这组评测真正帮助我确认的是错误边界：Candidate 阶段可以偏向召回，但 Verifier 必须更保守，避免机器人因为一次视觉误判就提前结束任务。同时，1040 条离线样本验证的是判断逻辑，仍不能完全替代停车、重新取帧和恢复巡场的在线真机时序。
+          </p>
+
+          <h2>语音评测：先把口径说清楚，再谈优化</h2>
+
+          <p>
+            项目中维护了两种不同评测。第一组是 115 条标准问答，用于对比 4 款候选模型的回答质量、Tool 命中和参数正确性，最终方案通过率为 91.3%；第二组是在同一 LiveKit Session 内连续执行 40 个用户 Turn，用于检查 ASR–LLM–TTS、上下文、Tool 调用和连续运行稳定性，最终 40 轮全部通过。两套评测回答的问题不同，不能简单合并成一个通过率。
+          </p>
+
+          <p>
+            延迟优化则使用 ASR、LLM、TTS 和端到端首音分阶段埋点定位瓶颈。通过调整 ASR 流式输入、TTS 流式输出，以及精简 Prompt 与 Tool Schema，端到端首音延迟 P50 从 3.8s 降至 2.05s。分阶段指标的价值在于说明时间消耗在哪一层，而不是只凭“感觉更快”判断优化是否有效。
+          </p>
+
+          <aside class="article-callout" aria-label="评测的真实价值">
+            <p class="article-callout-title">评测最重要的不是给项目找一个最好看的数字。</p>
+            <p>
+              它首先要回答“这一数字究竟测了什么”。LLM-only 选型、连续端到端对话、离线视觉帧和真机运行分别回答不同问题；一旦混用，数据越多，结论反而越不可信。
+            </p>
+          </aside>
+
+          <h2>这段经历真正让我学到什么</h2>
+
+          <ol class="article-list">
+            <li><strong>先验证物理事实，再调 Agent。</strong>声道、采样率、设备状态和原始 Topic 都可能伪装成模型问题。</li>
+            <li><strong>功能成功与实时成功是两套标准。</strong>8 核 CPU 最终能算完，不代表 20ms 音频帧能按时被处理。</li>
+            <li><strong>部署边界应由故障和对照实验决定。</strong>我们先保留 gateway，后来用 20 轮 Client 生命周期实验推翻原判断，才把它删除。</li>
+            <li><strong>抽象统一的是契约，不是每个字节的路径。</strong>ROS2、RTSP、WebRTC 和 HTTP 可以共存，只要上层媒体与 Tool 边界稳定。</li>
+            <li><strong>具身操作必须区分请求、执行和完成。</strong>模型说“已经挥手”之前，Runtime 至少要知道设备是否真的接受并开始执行。</li>
+            <li><strong>指标必须和评测协议绑定。</strong>标准问答、连续端到端对话和视觉巡场分别回答模型能力、链路稳定性与具身决策问题，不能互相替代。</li>
+          </ol>
+
+          <h2>仍然没有解决的问题</h2>
+
+          <ul class="article-list">
+            <li>双板拆分完成了真机闭环，但没有严格交错执行的前后 A/B，因此无法量化卡顿率或 P95 改善。</li>
+            <li>外部模型、识别与记忆服务仍会带来超时；人脸问候等待记忆召回就是一个尚未消除的真实例子。</li>
+            <li>并非所有厂商 Tool 都提供 Started / Completed 状态，物理动作的统一验证仍不完整。</li>
+            <li>1040 帧离线评测可以验证判断契约，但无法覆盖照明、遮挡、机械状态和停车后新帧时序。</li>
+            <li>40 轮连续对话全部通过，只能证明这组固定序列下的链路表现；它不是 40 个相互独立样本，也不足以单独证明线上长期稳定性。</li>
+          </ul>
+
+          <p>
+            回看整个过程，我并不是先想清楚一套完美的具身 Agent Harness，再把它实现出来。真实情况恰好相反：先跑通，遇到故障，提出猜测，用日志或对照实验排除错误解释，再重新划边界。今天能总结出的架构原则，都是这些具体问题留下来的结果。
+          </p>
+
+          <aside class="article-callout" aria-label="本文结论">
+            <p class="article-callout-title">Harness 的价值，不是让 Agent 看起来能控制机器人。</p>
+            <p>
+              它应该让我们知道声音卡在哪里、动作有没有真正发生、跨板超时为什么出现，以及一个指标到底证明了什么。只有这些问题能被回答，模型能力才有机会稳定地落到真实设备上。
+            </p>
+          </aside>
+
+          <div class="article-ending">
+            <p>
+              从 Voice Agent 到具身 Agent，增加的不只是摄像头和几个 Tool，而是一套围绕实时媒体、设备状态、部署边界和验证责任的工程工作。
+            </p>
+            <a href="../index.html#blog">继续阅读其他 Agent Engineering 文章 →</a>
+          </div>
+        </div>
+      </article>
+
+      <footer class="article-footer">
+        <a href="../index.html#blog">← 返回 Tech Blog</a>
+        <span>fightheyyy.github.io</span>
+      </footer>
+    </main>
+  </body>
+</html>
