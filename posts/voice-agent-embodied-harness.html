@@ -5,16 +5,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta
       name="description"
-      content="一次具身 Voice Agent 接入复盘：从 ARM 板上的 ROS2 音频闭环，到 CPU 卡顿、边缘计算板分体、跨板 DDS 排查、机器狗双阶段决策与端到端评测。"
+      content="一次机器人 Voice Agent 接入复盘：从 ARM 板上的 ROS2 音频闭环，到 CPU 卡顿、边缘计算板分体、跨板 DDS 排查、机器狗双阶段决策与端到端评测。"
     />
     <meta property="og:type" content="article" />
-    <meta property="og:title" content="从 Voice Agent 到具身 Agent：一套 Harness 的真机演进记录" />
+    <meta property="og:title" content="把 Voice Agent 接进机器人：一套 Harness 的真机演进记录" />
     <meta
       property="og:description"
       content="架构不是一开始画出来的，而是在声道选错、音频卡顿、跨板超时和真机误判中逐步收敛出来的。"
     />
     <meta property="article:published_time" content="2026-08-12" />
-    <title>从 Voice Agent 到具身 Agent：一套 Harness 的真机演进记录</title>
+    <title>把 Voice Agent 接进机器人：一套 Harness 的真机演进记录</title>
     <link rel="canonical" href="https://fightheyyy.github.io/posts/voice-agent-embodied-harness.html" />
     <link rel="icon" type="image/png" href="../assets/favicon.png" />
     <link
@@ -42,9 +42,9 @@
     <main class="article-shell">
       <article>
         <header class="article-header">
-          <p class="article-kicker">Voice Agent · Embodied Systems</p>
-          <h1 aria-label="从 Voice Agent 到具身 Agent：一套 Harness 的真机演进记录">
-            <span>从 Voice Agent 到具身 Agent：</span>
+          <p class="article-kicker">Voice Agent · Robot Systems</p>
+          <h1 aria-label="把 Voice Agent 接进机器人：一套 Harness 的真机演进记录">
+            <span>把 Voice Agent 接进机器人：</span>
             <span>一套 Harness 的</span>
             <span>真机演进记录</span>
           </h1>
@@ -205,10 +205,10 @@ External ASR / LLM / TTS / Recognition / Memory</code></pre>
           <h2>Tool 成功需要区分哪些事实</h2>
 
           <p>
-            真机调试之后，我把具身 Tool 的成功语义事后抽象成下面三层。它是由故障总结出的目标语义，不是当时已经统一落地的状态机。HTTP 200 只能证明请求到达；厂商接口返回 accepted，只能证明命令被接收。机器人还可能因为当前运动模式不允许、资源被占用或执行超时而没有真正做完。
+            真机调试之后，我把机器人 Tool 的成功语义事后抽象成下面三层。它是由故障总结出的目标语义，不是当时已经统一落地的状态机。HTTP 200 只能证明请求到达；厂商接口返回 accepted，只能证明命令被接收。机器人还可能因为当前运动模式不允许、资源被占用或执行超时而没有真正做完。
           </p>
 
-          <div class="article-table-wrap" tabindex="0" role="region" aria-label="具身 Tool 的事实层次">
+          <div class="article-table-wrap" tabindex="0" role="region" aria-label="机器人 Tool 的事实层次">
             <table>
               <thead>
                 <tr>
@@ -290,8 +290,8 @@ finish            resume</code></pre>
             <li><strong>功能成功与实时成功是两套标准。</strong>8 核 CPU 最终能算完，不代表 20ms 音频帧能按时被处理。</li>
             <li><strong>部署边界应由故障和对照实验决定。</strong>我们先保留 gateway，后来用 20 轮 Client 生命周期实验推翻原判断，才把它删除。</li>
             <li><strong>抽象统一的是契约，不是每个字节的路径。</strong>ROS2、RTSP、WebRTC 和 HTTP 可以共存，只要上层媒体与 Tool 边界稳定。</li>
-            <li><strong>具身操作必须区分请求、执行和完成。</strong>模型说“已经挥手”之前，Runtime 至少要知道设备是否真的接受并开始执行。</li>
-            <li><strong>指标必须和评测协议绑定。</strong>标准问答、连续端到端对话和视觉巡场分别回答模型能力、链路稳定性与具身决策问题，不能互相替代。</li>
+            <li><strong>机器人操作必须区分请求、执行和完成。</strong>模型说“已经挥手”之前，Runtime 至少要知道设备是否真的接受并开始执行。</li>
+            <li><strong>指标必须和评测协议绑定。</strong>标准问答、连续端到端对话和视觉巡场分别回答模型能力、链路稳定性与巡场决策问题，不能互相替代。</li>
           </ol>
 
           <h2>仍然没有解决的问题</h2>
@@ -305,7 +305,7 @@ finish            resume</code></pre>
           </ul>
 
           <p>
-            回看整个过程，我并不是先想清楚一套完美的具身 Agent Harness，再把它实现出来。真实情况恰好相反：先跑通，遇到故障，提出猜测，用日志或对照实验排除错误解释，再重新划边界。今天能总结出的架构原则，都是这些具体问题留下来的结果。
+            回看整个过程，我并不是先想清楚一套完美的机器人 Voice Agent Harness，再把它实现出来。真实情况恰好相反：先跑通，遇到故障，提出猜测，用日志或对照实验排除错误解释，再重新划边界。今天能总结出的架构原则，都是这些具体问题留下来的结果。
           </p>
 
           <aside class="article-callout" aria-label="本文结论">
@@ -317,7 +317,7 @@ finish            resume</code></pre>
 
           <div class="article-ending">
             <p>
-              从 Voice Agent 到具身 Agent，增加的不只是摄像头和几个 Tool，而是一套围绕实时媒体、设备状态、部署边界和验证责任的工程工作。
+              把 Voice Agent 接进机器人，增加的不只是摄像头和几个 Tool，而是一套围绕实时媒体、设备状态、部署边界和验证责任的工程工作。
             </p>
             <a href="../index.html#blog">继续阅读其他 Agent Engineering 文章 →</a>
           </div>
