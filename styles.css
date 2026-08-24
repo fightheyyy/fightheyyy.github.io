@@ -742,8 +742,46 @@ figure {
   transition: color 220ms ease, transform 320ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
+.index-title-link {
+  color: var(--text);
+  text-decoration: none;
+}
+
+.project-destinations {
+  grid-area: destination;
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.55rem;
+  color: var(--faint);
+  font-family: var(--display);
+  font-size: 0.74rem;
+  font-weight: 620;
+  white-space: nowrap;
+}
+
+.project-destinations a {
+  color: inherit;
+  text-decoration: none;
+  transition: color 220ms ease;
+}
+
+.project-destinations a:first-child {
+  color: var(--muted);
+}
+
+.project-destinations a:hover,
+.project-destinations a:focus-visible {
+  color: var(--accent);
+}
+
+.project-destination-separator {
+  color: var(--line-strong);
+}
+
 .index-link:hover .index-title,
-.index-link:focus-visible .index-title {
+.index-link:focus-visible .index-title,
+.project-link-multi:focus-within .index-title {
   color: var(--accent);
   font-weight: 760;
   transform: translateX(0.45rem);
