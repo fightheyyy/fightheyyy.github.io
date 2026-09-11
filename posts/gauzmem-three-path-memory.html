@@ -5,17 +5,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta
       name="description"
-      content="GauzMem 为什么不把 Agent 记忆简化成向量数据库：从 Fact 到 Chunk 的证据链，以及 Qdrant、Neo4j、MySQL 三路召回的工程设计。"
+      content="GauzMem 的三路召回设计：从 Fact 查回原始 Chunk，用 Qdrant、Neo4j 和 MySQL 找到相关内容、关系与前后对话。"
     />
     <meta property="og:type" content="article" />
-    <meta property="og:title" content="GauzMem：我为什么没有把 Agent 记忆做成一个向量数据库" />
+    <meta property="og:title" content="GauzMem：给检索到的记忆补上原文和上下文" />
     <meta
       property="og:description"
-      content="向量检索负责找到语义种子，图谱补关系，MySQL 补时间，最后返回一份可追溯的 Recall Bundle。"
+      content="GauzMem 的三路召回设计：从 Fact 查回原始 Chunk，用 Qdrant、Neo4j 和 MySQL 找到相关内容、关系与前后对话。"
     />
     <meta property="og:image" content="https://fightheyyy.github.io/assets/posts/gauzmem/hero.png" />
     <meta property="article:published_time" content="2026-07-17" />
-    <title>GauzMem：我为什么没有把 Agent 记忆做成一个向量数据库</title>
+    <title>GauzMem：给检索到的记忆补上原文和上下文</title>
     <link rel="canonical" href="https://fightheyyy.github.io/posts/gauzmem-three-path-memory.html" />
     <link rel="icon" type="image/png" href="../assets/favicon.png" />
     <link
@@ -43,35 +43,28 @@
       <article>
         <header class="article-header">
           <p class="article-kicker">Agent Memory · Retrieval Architecture</p>
-          <h1 aria-label="GauzMem：我为什么没有把 Agent 记忆做成一个向量数据库">
+          <h1 aria-label="GauzMem：给检索到的记忆补上原文和上下文">
             <span>GauzMem：</span>
-            <span>我为什么没有把 Agent 记忆</span>
-            <span>做成一个向量数据库</span>
+            <span>给检索到的记忆</span>
+            <span>补上原文和上下文</span>
           </h1>
           <p class="article-deck">
-            向量检索负责找到语义种子，图谱补关系，MySQL 补时间。真正交给 Agent 的不是一组相似文本，而是一份带证据、路径和顺序的 Recall Bundle。
+            一条相关的摘要，常常还不够回答问题。GauzMem 用 Qdrant 找候选事实，再用 Neo4j 和 MySQL 补上关系、前后对话与原始出处。
           </p>
           <div class="article-meta">
             <time datetime="2026-07-17">2026.07.17</time>
-            <span>约 12 分钟阅读</span>
+            <span>约 9 分钟阅读</span>
           </div>
         </header>
 
         <div class="article-content">
           <p class="article-lead">
-            做 Agent 记忆系统时，最容易得到的答案是：把历史对话切块，做 Embedding，存进向量数据库，查询时取 Top K。这个方案能跑，但它只解决了“哪些内容和问题看起来相似”，没有解决“这件事为什么发生”“它前后还有什么”“这条结论来自哪段原话”。
+            假设用户说过：“发布推迟到周五，因为支付集成还需要一次审查。”过几天再问为什么改期，检索到这句话还不够：后面是否又改了日期？审查最终过了没有？如果只拿回一条摘要，Agent 很容易漏掉这些变化。
           </p>
 
           <p>
-            GauzMem 的出发点因此不是再封装一次 Vector Search，而是把记忆做成一条可以回到原始证据的链路，再让语义、关系和时间分别承担自己擅长的召回职责。
+            GauzMem 围绕这类问题设计召回：先找相关事实，再补上关系和前后对话，每条事实都保留回到原文的路径。下面按一次查询的过程解释。
           </p>
-
-          <aside class="article-callout" aria-label="GauzMem 的三个设计判断">
-            <p class="article-callout-title">我真正想证明的，不是“三个数据库可以一起用”。</p>
-            <p>
-              记忆不是内容的堆积，而是查询发生时对证据、关系与顺序的重建；多存储不是技术栈展示，而是把权威、相似性和关系计算分配给最合适的系统；Agent 最终消费的也不该是若干命中结果，而应该是一份可解释的上下文合同。
-            </p>
-          </aside>
 
           <figure class="article-figure">
             <div class="article-figure-scroll">
@@ -84,13 +77,13 @@
                 />
               </a>
             </div>
-            <figcaption>图 1：GauzMem 的核心不是单一检索器，而是三条职责不同的召回路径。点击查看原图。</figcaption>
+            <figcaption>图 1：语义检索找到候选事实，图谱和时序查询补充上下文。点击查看原图。</figcaption>
           </figure>
 
-          <h2>向量检索只能回答“像不像”</h2>
+          <h2>检索到一句相关的话以后</h2>
 
           <p>
-            假设用户曾经说：“发布推迟到周五，因为支付集成还需要一次审查。”几天后，他问：“为什么发布日期变了？”向量检索大概率能找到这条 Fact，但仅靠相似度，系统仍然不知道它和哪段原始对话对应，也不知道上一轮讨论了什么、下一轮最终确认了什么。
+            向量检索可以找到与“发布日期变化”相关的内容。要回答完整，还需要取回对应原文、后续讨论，以及相关事实之间的联系。这些需要额外的数据组织和查询。
           </p>
 
           <p>这类缺口通常分成三种：</p>
@@ -101,11 +94,7 @@
             <li><strong>时间缺口</strong>：对话的前后轮次往往比另一条高相似文本更重要，顺序本身就是信息。</li>
           </ul>
 
-          <p>
-            所以我把向量检索放在召回入口，但没有让它成为整个记忆系统。
-          </p>
-
-          <h2>先把记忆拆成一条证据链</h2>
+          <h2>先让摘要能查回原文</h2>
 
           <pre class="article-flow" role="region" aria-label="GauzMem 记忆模型"><code>Source → Chunk → Fact → Entity / Relation → Topic
            ↑        ↑
@@ -133,7 +122,7 @@
                 <tr>
                   <td>Chunk</td>
                   <td>原文、turn、created_at</td>
-                  <td>承担证据与时序真相</td>
+                  <td>保留原文及其出现顺序</td>
                 </tr>
                 <tr>
                   <td>Fact</td>
@@ -155,10 +144,10 @@
           </div>
 
           <p>
-            这里最关键的字段不是某个漂亮的摘要，而是 <code>Fact.chunk_id</code>。它让任何派生事实都能回到生成它的 Chunk。没有这条边，系统只能告诉 Agent“我记得有这件事”；有了它，系统才能继续回答“我为什么记得、原话在哪里、当时前后发生了什么”。
+            <code>Fact.chunk_id</code> 把提取出的事实连回原始 Chunk。即使 Fact 的措辞经过模型改写，也能查到用户当时说了什么。这条关联同时也是时序扩展的入口。
           </p>
 
-          <h2>三路召回不是三个数据库并排查询</h2>
+          <h2>一次查询怎样经过三条路径</h2>
 
           <figure class="article-figure">
             <div class="article-figure-scroll" tabindex="0" aria-label="可横向滚动的 GauzMem 三路召回架构图">
@@ -183,7 +172,7 @@
           </p>
 
           <p>
-            语义结果本身也会进入最终合并，但它更重要的作用，是给关系扩展和时序扩展提供可靠起点。三路召回因此不是三次互不相干的搜索，而是<strong>先找到种子，再从不同维度恢复上下文</strong>。
+            这一步的命中结果会进入最终返回值。其中的 seed Fact IDs 还会交给图谱和时序查询，作为后续扩展的起点。
           </p>
 
           <h3>第二路：Neo4j 补回关系</h3>
@@ -193,13 +182,13 @@
           </p>
 
           <p>
-            这条路径回答的是结构问题：什么导致了这件事，哪条事实支持它，后面又发生了什么。向量相似度可以发现“支付审查”和“发布日期变化”相关；图关系才能明确它们之间是因果还是仅仅同时出现。
+            回到改期的例子：如果图中记录了“支付审查”与“发布日期变化”的因果关系，就可以沿这条边把两件事一起取回。关系本身也是提取结果，是否可信仍要对照原文检查。
           </p>
 
           <h3>第三路：MySQL 补回时间</h3>
 
           <p>
-            时序扩展最容易被误解成“读取 Fact metadata 里的时间”。GauzMem 实际上不依赖把时间复制进 Fact metadata，而是从 Fact 回到 Chunk：
+            时间信息保存在 Chunk 上。时序扩展从 seed Fact IDs 查回对应 Chunk，再按轮次或时间窗口取邻近内容：
           </p>
 
           <pre class="article-flow" role="region" aria-label="GauzMem 时序扩展链路"><code>seed Fact IDs
@@ -215,20 +204,13 @@ temporal context</code></pre>
           </p>
 
           <p>
-            time 模式使用 <code>mem_chunks.created_at</code> 计算窗口。当前实现把一跳映射为五分钟，再按方向扩展。无论是哪种模式，时间和顺序都属于原始证据 Chunk，而不是某个可能漂移的派生向量 payload。
+            time 模式使用 <code>mem_chunks.created_at</code> 计算窗口，本文所述实现把一跳设为五分钟，再按方向扩展。这样查询只需要使用 Chunk 上的时间，不必同时维护 Fact metadata 中的一份副本。
           </p>
 
-          <aside class="article-callout" aria-label="时序扩展设计原则">
-            <p class="article-callout-title">时序扩展的种子是 Fact，时钟来自 Chunk。</p>
-            <p>
-              Fact 负责指出“哪条记忆相关”，Chunk 负责回答“它在什么时候、哪一轮、什么原文里出现”。这两个职责不能混在同一个 metadata 对象里。
-            </p>
-          </aside>
-
-          <h2>为什么 MySQL 是真相源，另外两个是投影</h2>
+          <h2>三份存储，以哪份为准</h2>
 
           <p>
-            三个数据库同时存在，不代表它们拥有同等权威。GauzMem 把 MySQL 当作 Source、Chunk、Fact、Topic、turn、created_at 和 provenance 的持久化真相源；Qdrant 和 Neo4j 是为特定查询优化的投影。
+            Source、Chunk、Fact、Topic，以及轮次、时间和来源关联都持久化在 MySQL。Qdrant 保存向量索引，Neo4j 保存用于查询的图结构；这两份数据都可以从持久化记录重建。
           </p>
 
           <div class="article-table-wrap" tabindex="0" role="region" aria-label="GauzMem 存储职责">
@@ -249,7 +231,7 @@ temporal context</code></pre>
                 <tr>
                   <td>Qdrant</td>
                   <td>conversation、Fact、Topic 的语义索引</td>
-                  <td>可从真相源重新嵌入构建</td>
+                  <td>可从 MySQL 记录重新生成向量</td>
                 </tr>
                 <tr>
                   <td>Neo4j</td>
@@ -261,10 +243,10 @@ temporal context</code></pre>
           </div>
 
           <p>
-            这种 authority / projection 分离让系统更容易解释一致性问题：检索索引可以异步更新，也可以重建；真正不能丢的是证据链。它还避免把 Qdrant payload 或 Neo4j 节点误当成所有业务状态的唯一来源。
+            这也给同步故障留了处理办法：Qdrant 或 Neo4j 的索引出问题，可以从 MySQL 重建。不过“可以重建”不等于查询时总是一致，异步更新的延迟和失败仍然需要监测。
           </p>
 
-          <h2>Recall Bundle 才是面向 Agent 的产品边界</h2>
+          <h2>最后交给 Agent 的内容</h2>
 
           <p>
             如果 API 直接返回三份列表，调用方仍然需要理解 Qdrant、Neo4j 和 MySQL 的内部结构。GauzMem 在最后一步把三路结果合并、去重，并保留 source、path、time、chunk_id、hop level 等追溯信息，形成 Recall Bundle。
@@ -280,30 +262,20 @@ temporal context</code></pre>
           </ul>
 
           <p>
-            这也是我把系统定位成 memory service，而不是 vector database wrapper 的原因。数据库是实现细节，Recall Bundle 才是 Agent 真正消费的上下文合同。
+            调用方拿到这份 Recall Bundle，就可以读取事实、查看来源，必要时回到 Chunk 核对原文，不必分别访问三个数据库。
           </p>
 
-          <h2>短期记忆与长期记忆不应该互相等待</h2>
+          <h2>刚说过的话，要先存下来</h2>
 
           <p>
-            一段对话进入 GauzMem 后，原始 Chunk 会先成为可用的短期记忆，后台再继续抽取 Fact、Entity、Relation 和 Topic，并更新向量与图谱投影。这个顺序的重点不是“用了异步任务”，而是先保住证据，再生产解释：即使后面的编译暂时失败，刚刚发生的对话仍然存在，也仍然可以重新加工。
-          </p>
-
-          <p>
-            这让写入延迟和记忆质量可以分开优化：短期路径优先保证“刚说过的话不会忘”，长期路径再负责把原始对话编译成更稳定的知识结构。项目已经实测的结果包括短期记忆可用时间小于 1 秒、向量召回小于 100 ms、图召回小于 500 ms，以及 SOTA 长期记忆表现。
-          </p>
-
-          <h2>三路召回不是从零并行，而是先找到记忆锚点</h2>
-
-          <p>
-            把三路召回理解成“三个数据库各查一次”仍然不够准确。图谱不知道应该从哪里开始遍历，时间也不知道应该围绕哪一刻展开。语义召回的真正价值不是直接给出最终答案，而是先把查询收敛成一小组 seed Facts，为后两条路径确定记忆锚点。
+            一段对话进入后，先保存原始 Chunk，供短期记忆使用。Fact、Entity、Relation 和 Topic 的抽取，以及向量和图谱的更新放到后台。后续抽取失败时，原文还在，可以重新处理。
           </p>
 
           <p>
-            有了锚点，图谱扩展才能回答“这条事实沿什么关系连到另一条事实”，时序扩展才能回答“这条事实前后发生了什么”。因此，先语义、再扩展不是数据库编排技巧，而是一条认识论约束：每一段新增上下文，都必须能够说明自己从哪条记忆出发，以及为什么被带回来。
+            这里分开处理的是两种等待：用户刚说的话需要尽快可读，整理长期记忆可以晚一点完成。具体能做到多快，还取决于数据量、模型和部署条件。
           </p>
 
-          <h2>这套设计仍然有明确边界</h2>
+          <h2>代价和还要处理的问题</h2>
 
           <ul class="article-list">
             <li>图扩展限制在一到三跳，防止关系数量失控；更多跳数不天然等于更好的上下文。</li>
@@ -313,19 +285,12 @@ temporal context</code></pre>
           </ul>
 
           <p>
-            这些边界反而让系统更可靠。一个记忆服务不需要假装自己解决了所有智能问题，它只需要清楚地说明：什么是事实，什么是投影，召回为什么发生，证据能否回去。
+            三路召回也增加了存储、同步和排障的工作量。如果任务只需要找回相似片段，未必需要完整地引入这套结构。GauzMem 多做的部分，主要用来回答来源、关系和前后顺序。
           </p>
-
-          <aside class="article-callout" aria-label="GauzMem 核心设计判断">
-            <p class="article-callout-title">判断一个系统有没有记忆，不看它存了多少，而看它能否重建上下文。</p>
-            <p>
-              向量数据库适合找到“像”的内容，但 Agent 需要的是可以解释“为什么、前后是什么、证据在哪里”的记忆。语义、关系和时间应该分别建模，再在同一个可追溯合同中汇合。
-            </p>
-          </aside>
 
           <div class="article-ending">
             <p>
-              GauzMem 已经开源。对我而言，它首先是一份可运行的架构判断：Agent 的记忆不应止于保存和命中，而应该能够沿证据、关系和时间重新组织上下文。
+              源码里可以从 <code>Fact.chunk_id</code> 对应的查询看起：先找到 seed，再查图关系和邻近 Chunk，最后看结果如何合并。
             </p>
             <a href="https://github.com/fightheyyy/gauzmem" target="_blank" rel="noreferrer">
               View GauzMem on GitHub →

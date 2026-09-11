@@ -5,17 +5,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta
       name="description"
-      content="为什么 Agent Eval 的终点不是排行榜，而是发布 CI：Barena 如何用成对实验、重放、Artifact Verifier 和真实执行证据判断一次 Agent 变更能不能发布。"
+      content="Barena 怎样比较 Agent 的新旧配置、验证产物并判断能否发布，以及一轮 24 个任务、144 次运行的实验。"
     />
     <meta property="og:type" content="article" />
-    <meta property="og:title" content="Barena：Agent Eval 的终点，不是排行榜，而是发布 CI" />
+    <meta property="og:title" content="Barena：改完 Agent，怎样判断这一版能不能发" />
     <meta
       property="og:description"
-      content="从一次 Agent 变更的发布问题出发，讨论 baseline、稳定性、证据边界，以及 24 个公开任务、144 次运行的真实实验。"
+      content="Barena 怎样比较 Agent 的新旧配置、验证产物并判断能否发布，以及一轮 24 个任务、144 次运行的实验。"
     />
     <meta property="article:published_time" content="2026-07-17" />
     <meta property="article:modified_time" content="2026-07-28" />
-    <title>Barena：Agent Eval 的终点，不是排行榜，而是发布 CI</title>
+    <title>Barena：改完 Agent，怎样判断这一版能不能发</title>
     <link rel="canonical" href="https://fightheyyy.github.io/posts/barena-agent-release-ci.html" />
     <link rel="icon" type="image/png" href="../assets/favicon.png" />
     <link
@@ -44,28 +44,27 @@
       <article>
         <header class="article-header">
           <p class="article-kicker">Agentic Eval · Release Engineering</p>
-          <h1 aria-label="Barena：Agent Eval 的终点，不是排行榜，而是发布 CI">
+          <h1 aria-label="Barena：改完 Agent，怎样判断这一版能不能发">
             <span>Barena：</span>
-            <span>Agent Eval 的终点，</span>
-            <span>不是排行榜，</span>
-            <span>而是发布 CI</span>
+            <span>改完 Agent，</span>
+            <span>怎样判断这一版能不能发</span>
           </h1>
           <p class="article-deck">
-            每一次 Agent 变更都会产生一项证明义务：它是否真的更好、稳定、无回归，而且证据足够。Barena 想做的不是另一个评分器，而是把这项证明义务变成可执行的发布协议。
+            把新旧配置放进同一组任务，检查产物，再看提升是否稳定。一轮 144 次运行的实验，让我重新收紧了哪些数据可以用来比较。
           </p>
           <div class="article-meta">
             <time datetime="2026-07-28">更新于 2026.07.28</time>
-            <span>约 13 分钟阅读</span>
+            <span>约 11 分钟阅读</span>
           </div>
         </header>
 
         <div class="article-content">
           <p class="article-lead">
-            我做 Barena 时，最先困住我的并不是“怎么给 Agent 打分”，而是一个更实际的问题：我刚改了 Prompt、换了模型、加了 Skill，这一版到底敢不敢发？
+            改了一段 Prompt，换了模型，或者给 Agent 加了一个 Skill，这一版能不能发？这是我做 Barena 时想解决的问题。手动试几次可以发现明显错误，但很难判断它比上一版好在哪里，又有没有把原来能做的事弄坏。
           </p>
 
           <p>
-            一个 Agent 能完成任务，不等于这次改动值得发布。它可能本来就会；也可能平均表现更好，却把一个关键旧能力做坏；还可能只在这一次碰巧成功。于是评测的对象不应该只是“一个 Agent”，还应该是从 baseline 到 candidate 的这次变化。
+            因此每次评测都要带上旧版本。下文把旧配置叫 baseline，新配置叫 candidate：两边跑同一组任务，再比较成功率、失败原因和结果是否稳定。
           </p>
 
           <h2>几行 diff，为什么单元测试兜不住</h2>
@@ -75,15 +74,8 @@
           </p>
 
           <p>
-            传统测试仍然重要，它擅长证明确定性组件满足局部合同。Agent E2E 要补的是另一块：在接近真实的任务压力和运行环境下，这个由多个非确定性部件组成的系统，能不能稳定地产生可验证结果。
+            单元测试可以检查参数转换、文件读写等确定性逻辑。模型会选哪个工具、失败后会不会重试，则需要把 Agent 放进任务里实际运行。两部分都要测。
           </p>
-
-          <aside class="article-callout" aria-label="Barena 的发布问题">
-            <p class="article-callout-title">每一个 Agent 变更都应该背负一项证明义务。</p>
-            <p>
-              Candidate 需要证明的不只是“我能通过”，而是“相比 baseline，我带来了稳定提升，没有破坏旧能力，而且这个结论有足够证据”。
-            </p>
-          </aside>
 
           <figure class="article-figure article-figure-wide barena-architecture-figure">
             <div class="article-figure-scroll" tabindex="0" aria-label="可横向滚动的 Barena Agent Release CI 架构图">
@@ -103,7 +95,7 @@
             </figcaption>
           </figure>
 
-          <h2>Benchmark、Eval 和 Release CI 问的是三件事</h2>
+          <h2>为什么还要和上一版比较</h2>
 
           <div class="article-table-wrap" tabindex="0" role="region" aria-label="Benchmark、Eval 与 Release CI 的区别">
             <table>
@@ -135,17 +127,13 @@
           </div>
 
           <p>
-            排行榜适合回答模型或 Agent 的相对能力，却很难直接替团队做发布决策。一个 Skill 在公共任务上拿到高分，不代表它对当前 Role 有增益；一个新模型平均分更高，也可能让最重要的回归用例从稳定通过变成偶发失败。
+            公共任务上的分数有参考价值，但不直接回答某次改动值不值得采用。一个 Skill 得分很高，当前 Agent 可能本来就会做这些任务；一个模型平均分更高，也可能在重要的旧任务上更不稳定。
           </p>
 
-          <p>
-            所以 Barena 不是在找“最聪明的 Agent”。它评估的是一次发布候选：在同一目标 Runtime、同一组 Case、同一套约束下，从 baseline 到 candidate 究竟发生了什么。
-          </p>
-
-          <h2>Release Eval 本质上是一个反事实问题</h2>
+          <h2>尽量只改一个变量</h2>
 
           <p>
-            “Candidate 能不能完成任务”只是能力问题；“如果没有这次变更，同一个任务会怎样”才是发布问题。后一个问题天然包含反事实：只有观察相同条件下 baseline 与 candidate 的差异，结果才有机会归因到这次变更。
+            要判断改动有没有用，先尽量固定其他条件。同一个任务分别交给 baseline 和 candidate，比较两边的结果。即便这样，模型和环境的波动仍然会影响判断。
           </p>
 
           <pre class="article-flow" role="region" aria-label="Barena 的发布评测输入与输出"><code>Barena(
@@ -162,17 +150,17 @@
   → cleared | held | rejected</code></pre>
 
           <p>
-            对 Skill 来说，Barena 在同一个 Agent 上比较“不加载”和“加载候选 Skill”；对于其他变化，也需要尽量固定任务、Runtime、模型、工具和验证器，只改变要评估的候选项。它不是严格的实验室因果，但至少把问题缩小到：除了这次变更，还有什么不同？
+            评测 Skill 时，两边使用同一个 Agent，一边不加载，另一边加载候选 Skill。评测其他改动时，也尽量固定任务、Runtime、模型、工具和验证器，只改变待评估的那一项。
           </p>
 
-          <h2>一个高分本身没有因果含义</h2>
+          <h2>两边都满分，也可能看不出改进</h2>
 
           <p>
-            假设 Candidate 跑出了 100% 通过率，看起来很好。但如果 baseline 也是 100%，这次变更并没有证明任何效果。Barena 会把这种结果标成 <code>no_effect</code> 并 <code>held</code>，而不是因为候选拿到满分就允许发布。
+            假设两边通过率都是 100%，这组任务就没有显示出 candidate 的增益。在 Barena 当前这套规则下，结果会标成 <code>no_effect</code>，发布状态为 <code>held</code>。这不表示改动毫无价值，只表示这次评测没有测到提升。
           </p>
 
           <p>
-            反过来，如果总体通过率提高，却有关键 Case 从稳定通过变成偶发失败，平均分也不能替它开脱。Release CI 关心的不只是总体 lift，还要保护那些不能退化的具体能力。
+            如果总通过率提高，但关键 Case 从稳定通过变成偶发失败，也需要单独处理。平均分会把这类退化藏起来，所以发布判断还要检查每个 Case。
           </p>
 
           <pre class="article-flow" role="region" aria-label="Barena 成对评测流程"><code>same task + same runtime + fresh workspace
@@ -189,7 +177,7 @@
           <h2>Agent 说“完成了”，不能算完成</h2>
 
           <p>
-            这是做 Agent Eval 最容易踩的坑。Agent 可以非常自信地说“文件已经生成”，Reviewer 也可能觉得它的回答不错，但磁盘上根本没有目标文件。只让另一个模型评价它，最后很容易变成两个模型互相认可。
+            比如 Agent 回答“文件已经生成”，但磁盘上没有目标文件。再找一个模型读它的回答，仍然可能漏掉这个问题。文件任务需要直接检查文件。
           </p>
 
           <p>
@@ -225,14 +213,14 @@
             </table>
           </div>
 
-          <h2>结论不能超过证据的边界</h2>
+          <h2>没有观察到的过程，就留空</h2>
 
           <p>
-            在 Barena 里，Trace 是整条评测链的 evidence spine。每次尝试会保留任务输入、进程状态、工作区变化、Runtime 原生轨迹和 Verifier 结果。能通过 OpenTelemetry 导出的原生 Trace 统一走 OTLP；Barena 自己从进程和文件系统看到的 boundary evidence 则单独标记来源。
+            每次尝试会保存任务输入、进程状态、工作区变化、Runtime 原生轨迹和 Verifier 结果。原生 Trace 可以通过 OpenTelemetry 的 OTLP 协议导出；Barena 从进程和文件系统观察到的结果则另记为 boundary evidence，标明来源。
           </p>
 
           <p>
-            这个区别很重要。只有进程边界证据，就只能说明看到了输入、输出和副作用；没有 Runtime 原生 Trace，就不能声称知道内部工具序列；没有 Verifier，也不能把模型判断写成 Outcome Truth。评测系统不能为了让报告完整，补写自己没有观察到的事实。
+            只观察到进程输入、输出和文件变化，就无法还原内部工具调用顺序。缺了原生 Trace，这部分就留空；没有 Verifier 结果，也不能拿 Reviewer 的评价当作验证通过。
           </p>
 
           <pre class="article-flow" role="region" aria-label="Barena 证据流"><code>User task
@@ -247,20 +235,20 @@ validated evidence package
    ↓
 paired release gate</code></pre>
 
-          <h2>可靠性不是附加指标，它本身就是能力</h2>
+          <h2>多跑几次，看结果会不会变</h2>
 
           <p>
-            非确定性系统最危险的结果不是稳定失败，而是偶尔成功。只跑一次时，一个 flaky candidate 和稳定 candidate 都可能显示绿色；进入真实使用后，前者才暴露出用户需要反复重试。
+            只跑一次，很难分清稳定通过和碰巧成功。实际使用中，如果同样的任务经常需要重试，一次绿色结果就没什么说服力。
           </p>
 
           <p>
-            Barena 因此把多次独立 attempt 纳入发布判断。有提升但 flaky 的候选仍然会被 <code>held</code>，因为用户无法消费“平均意义上的成功”，只能消费眼前这一次任务到底有没有完成。
+            Barena 会为同一个配置运行多次独立 attempt。候选即使有提升，结果仍然不稳定时也会被 <code>held</code>，留待继续检查。
           </p>
 
-          <h2>Unknown 不是失败，而是必须保留的结果</h2>
+          <h2>证据不够时，暂缓发布</h2>
 
           <p>
-            Eval 系统最糟糕的失败方式，不是报错，而是在缺少运行条件或证据时给出一个看似完整的成功。Barena 因此把发布结论分成三态：
+            工具没启动、Verifier 没运行、配对的一边没有结果，都可能让比较无法进行。Barena 用三种状态表达发布判断：
           </p>
 
           <ul class="article-list">
@@ -270,17 +258,17 @@ paired release gate</code></pre>
           </ul>
 
           <p>
-            <code>held</code> 非常关键。缺少证据不等于失败，更不等于通过；它只表示当前没有足够资格做发布决定。把“未知”单独建模，CI 才不会用一个假精确的数字掩盖基础设施问题。
+            <code>held</code> 表示现在还不能做发布决定。需要继续区分是候选表现不稳定，还是运行条件、证据收集出了问题，不能一律算成 Agent 做错了。
           </p>
 
           <h2>一个真实案例：144 次运行之后，能比较的只剩 36 对</h2>
 
           <p>
-            只有框架和 fake fixture 还不够。我从 SkillsBench v1.1 的 8 个类别里各选了 3 个公开任务，用同一个 XiaoBaOS Agent 比较“不加载任务 Skill”和“加载任务 Skill”。每边独立运行 3 次，完整矩阵是 24 个任务 × 2 个 arm × 3 次 trial，共 144 次 rollout。
+            我用 SkillsBench v1.1 做了一轮验证：从 8 个类别各选 3 个公开任务，用同一个 XiaoBaOS Agent 比较“不加载任务 Skill”和“加载任务 Skill”。每边独立运行 3 次，共 24 × 2 × 3 = 144 次 rollout。
           </p>
 
           <p>
-            任务是否成功只看 SkillsBench 的确定性 Verifier，不采用 Agent 自述，也不拿 Reviewer 分数代替。真正让我在意的不是跑出了多少数字，而是这些数字里有多少具备比较资格。
+            成功与否由 SkillsBench 的确定性 Verifier 判断。问题出在数据收齐之后：并非每次运行都有足够证据进入比较。
           </p>
 
           <figure class="article-figure barena-results-figure">
@@ -342,16 +330,16 @@ paired release gate</code></pre>
           </p>
 
           <aside class="article-callout" aria-label="SkillsBench 实验真正验证了什么">
-            <p class="article-callout-title">这次实验验证的是评测方法，不是给 XiaoBaOS 发一张冠军证书。</p>
+            <p class="article-callout-title">144 次运行，不能直接放进同一个分母。</p>
             <p>
-              Barena 能把“运行完成”“证据有效”“样本可比较”和“允许发布”分开；数据不够时返回 held，而不是为了讲故事把所有运行塞进同一个分母。
+              运行结束后，还要检查 Verifier 是否执行、两边是否有有效配对。按完整任务判断发布时，9 个任务中有 2 个 cleared、7 个 held，没有 rejected。
             </p>
           </aside>
 
-          <h2>真数据反过来改变了评测规则</h2>
+          <h2>这轮实验后补上的规则</h2>
 
           <p>
-            这 144 次运行最有价值的地方，是它逼框架暴露了原先容易偷懒的地方。实验结束后，我把几条规则写得更硬：
+            做完这轮实验，我把数据准入规则收紧了：
           </p>
 
           <ul class="article-list">
@@ -362,20 +350,20 @@ paired release gate</code></pre>
           </ul>
 
           <p>
-            所以 Release Eval 的第一产物不是 score，而是 validity。只有 Runtime、输入、隔离和证据协议先成立，baseline / candidate 的差异才值得解释。
+            这些检查过了，才开始解释 baseline 和 candidate 的差值。否则算出的通过率可能只反映两边跑成了不同的任务。
           </p>
 
-          <h2>最后，它才落到三个产品动作上</h2>
+          <h2>日常使用的三个入口</h2>
 
           <p>
-            到这里，Barena 的三个入口才变得自然：<code>explore</code> 用 UserCat 模拟真实用户，寻找还没有写进测试集的边界；<code>replay</code> 重放固定 Case，保护已经确认的能力；<code>compare</code> 聚合 baseline 与 candidate 的有效证据，给出发布判断。
+            Barena 提供三个入口：<code>explore</code> 用 UserCat 模拟用户，寻找测试集没覆盖的问题；<code>replay</code> 重跑固定 Case；<code>compare</code> 对比 baseline 和 candidate 的有效结果，给出发布判断。
           </p>
 
           <p>
-            Explore 发现的问题可以沉淀成下一轮 Replay Case；Replay 和 Explore 都通过 Runtime Adapter 执行真实 Agent，并保留 OTel Trace、Artifact 与 Verifier。它们不是三套互不相干的功能，而是同一个行为回归闭环里的三个动作。
+            Explore 发现的问题可以保存成 Replay Case。两者通过 Runtime Adapter 执行 Agent，留下 Trace、Artifact 与 Verifier 结果，供后续比较使用。
           </p>
 
-          <h2>Barena 当前仍然有明确边界</h2>
+          <h2>目前做到哪里</h2>
 
           <ul class="article-list">
             <li>当前深度适配的 Explore Runtime 是 XiaoBaOS；Claude Code、Codex 和 OpenClaw 的多轮 Explore Adapter 仍待完成。</li>
@@ -385,13 +373,9 @@ paired release gate</code></pre>
             <li>有限次 Replay 能暴露一部分 flakiness，但不能证明概率意义上的绝对稳定。</li>
           </ul>
 
-          <p>
-            这些限制不需要藏起来。一个可信的 Agent Eval 系统不必声称自己看见一切，但必须准确区分：它看见了什么、没有看见什么，以及现有证据允许做出多强的结论。
-          </p>
-
           <div class="article-ending">
             <p>
-              Benchmark 告诉我们一个 Agent 大概处在什么位置；Release CI 要回答的是下一次改动能不能进入生产。Barena 想把这件事变成持续协议：用真实任务制造压力，用成对实验观察变化，用 Trace 解释过程，用 Verifier 检查结果，最后再决定这次变化值不值得信任。
+              下一步还要补齐其他 Runtime 的 Explore Adapter 和任意 RunSet 对比。已经公开的 SkillsBench 报告里保留了准入规则和排除项，可以据此检查上面这些数字是怎样算出来的。
             </p>
             <a href="https://github.com/fightheyyy/barena" target="_blank" rel="noreferrer">
               View Barena on GitHub →

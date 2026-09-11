@@ -5,13 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta
       name="description"
-      content="xiaobaOS 从一个能调用工具的 CLI Agent 出发，在企业 IM、长任务交付、能力复用与行为回归中逐步演进为 Runtime。"
+      content="xiaobaOS 的演进记录：从 CLI 和飞书接入，到后台任务、统一消息交付、Role / Skill 复用与回归评测。"
     />
     <meta property="og:type" content="article" />
     <meta property="og:title" content="XiaoBaCLI to XiaoBaOS" />
     <meta
       property="og:description"
-      content="从能调用工具，到能在 IM 中持续工作、交付结果、留下证据并受控进化：一次真实的 Agent Runtime 演进复盘。"
+      content="xiaobaOS 的演进记录：从 CLI 和飞书接入，到后台任务、统一消息交付、Role / Skill 复用与回归评测。"
     />
     <meta property="article:published_time" content="2026-07-17" />
     <meta property="article:modified_time" content="2026-08-14" />
@@ -48,49 +48,38 @@
             <span>to XiaoBaOS</span>
           </h1>
           <p class="article-deck">
-            xiaobaOS 不是先画出一套 Agent OS 再寻找问题；它从一个能调用工具的 CLI Agent 出发，在企业 IM、长任务交付、行业能力复用和行为回归中逐步演进为 Runtime。
+            从 CLI 接到飞书后，长任务会阻塞对话，多个 Subagent 会同时发消息，生成的文件也未必送到了用户手里。这篇记录 xiaobaOS 怎样逐项处理这些问题，再补上回归评测。
           </p>
           <div class="article-meta">
             <time datetime="2026-07-17">2026.07.17</time>
             <span>更新于 2026.08.14</span>
-            <span>约 12 分钟阅读</span>
+            <span>约 10 分钟阅读</span>
           </div>
         </header>
 
         <div class="article-content">
           <p class="article-lead">
-            我最初做 xiaobaCLI 时，并没有打算造一个“Agent OS”。目标很直接：参考成熟 Coding Agent 的形态，搭好 Agent Loop 和 Base Tools，让模型能在真实工作目录里完成任务。前半段演进直接来自企业 IM 与行业交付，后半段则是在复盘试点暴露的稳定性和发布风险后继续补齐；其中一些机制仍在验证，不能倒叙成一开始就想清楚的蓝图。
+            xiaobaCLI 最初参考了 Coding Agent 的形态：搭好 Agent Loop 和 Base Tools，让模型能在工作目录里读文件、跑命令、完成任务。接入飞书后，用户会在长任务运行时继续发消息，还需要拿到真正送达的文件。很多后来的改动，都是为了解决这些问题。
+          </p>
+
+          <h2>CLI 和飞书是一起做起来的</h2>
+
+          <p>
+            基础 CLI 出现后，Session、Context 压缩和第一个飞书入口几乎同时加进来。工具调用需要连续执行，多轮消息也需要保存状态。微信入口是后来才加的。
           </p>
 
           <p>
-            回头看，这条演进路径可以压缩成一句话：<strong>聊天 CLI → 能干活的 Agent Harness → IM 在线同事 → 可复用职业底座 → 可评测 Runtime → 可治理进化 OS</strong>。
-          </p>
-
-          <h2>起点：先让 Agent 真正完成任务</h2>
-
-          <p>
-            xiaobaCLI 的起点主要解决“能不能干活”。基础 CLI 出现后，Session、Context 压缩与第一个飞书入口几乎同时进入系统：Agent 既要持续调用文件、Shell 和搜索工具，也要在多轮消息中保存状态，而不是每一步都从头开始。微信是后续新增的入口，不是最初触发架构变化的原因。
+            工程咨询里已有报告生成、资料检索、图表生成和图纸分析能力，我把它们封装成 Skill。生物信息场景里，则把企业已有的 Python、R 脚本参数化，让 Agent 组织参数，按固定流程调用。业务算法继续用原来那套。
           </p>
 
           <p>
-            在工程咨询场景里，我把已有的报告生成、资料检索、图表生成和图纸分析能力封装成 Skill；在生物信息场景里，则把企业已有的 Python、R 脚本参数化，让 Agent 能按固定流程调用。这里的关键并不是让模型重新发明业务算法，而是把已经存在、已经被专家使用的能力变成可组合的执行接口。
+            所以前期是一边补执行能力，一边在飞书里使用。CLI 中习惯的交互方式，很快就不够用了。
           </p>
 
-          <aside class="article-callout">
-            <p class="article-callout-title">第一阶段的判断</p>
-            <p>
-              Runtime 提供通用执行机制，Skill 封装领域流程。Agent 的价值不是替代成熟脚本，而是理解用户目标、组织参数、调用能力并交付结果。
-            </p>
-          </aside>
+          <h2>长任务运行时，用户还会继续发消息</h2>
 
           <p>
-            因此，项目并不存在一段“CLI 已经完全做好，才开始接 IM”的整齐阶段。更真实的过程是：一边补 Agent Harness，一边把它放进飞书使用；CLI 的默认假设也在这个过程中不断失效。
-          </p>
-
-          <h2>转折：Coding Agent 直接搬进 IM 为什么不成立</h2>
-
-          <p>
-            CLI 中合理的交互，在 IM 中未必合理。IM 不是远程终端，用户也不是在启动一次性 Job；他会在任务运行时继续追问、补充条件，甚至要求停止。一个像同事的 Agent，还不能把几十次工具调用连续刷进聊天窗口，最后再丢下一句“已完成”。
+            用户会在 IM 里追问进度、补充条件，也会要求停止。如果长任务一直占着主会话，就处理不了这些消息；把工具日志全部发出来，又会让聊天窗口不断刷屏。
           </p>
 
           <div class="article-table-wrap" tabindex="0" role="region" aria-label="CLI Agent 与 IM Agent 的差异">
@@ -127,11 +116,7 @@
             </table>
           </div>
 
-          <p>
-            这让我重新定义了产品：<strong>IM Agent 不是套了消息入口的 Coding Agent，而是一个需要持续在线、能并行工作、并对交付负责的 Runtime。</strong>
-          </p>
-
-          <h2>第一次架构跃迁，以及一次真实返工</h2>
+          <h2>把长任务拆出去后，又改了一次消息出口</h2>
 
           <p>原来的执行链很简单，也很容易阻塞：</p>
 
@@ -166,11 +151,11 @@ Main Agent → send_text / send_file → User</code></pre>
           </p>
 
           <p>
-            这里还有一个容易被忽略的区别：<code>send_text</code> 和 <code>send_file</code> 不是普通业务 Tool，而是用户可见消息的交付边界。默认情况下，模型生成 final text 不会自动外发；发送成功必须形成结构化 Delivery Evidence，平台能够返回消息或文件确认时，再补充 External Delivery Receipt。
+            <code>send_text</code> 和 <code>send_file</code> 决定哪些内容真正发给用户。模型生成 final text 后，默认不会自动外发。发送结果保存为 Delivery Evidence；平台返回消息或文件确认时，再附上 External Delivery Receipt。
           </p>
 
           <p>
-            这个设计没有消灭所有分布式系统问题。外部副作用发生后无法靠停止 Subagent 回滚，运行中任务的跨进程恢复也仍未完全收口。当前停止语义可以关闭 Runtime 会话并阻止迟到结果继续回注，但 Provider、Shell 或脱管子进程能否立即物理终止，仍取决于对应 Adapter 是否正确传播 AbortSignal。它先解决的是 IM 场景最核心的矛盾：<strong>后台工作可以很长，用户交互不能因此停住。</strong>
+            但停止任务仍有边界：已经发生的外部写操作无法撤回，跨进程恢复也还没做完整。当前可以关闭 Runtime 会话、阻止迟到结果回注；Provider、Shell 或脱管子进程能否立即停止，要看 Adapter 有没有正确传递 AbortSignal。
           </p>
 
           <h2>从硬编码 Agent 到 Role / Skill 分层</h2>
@@ -214,21 +199,21 @@ Main Agent → send_text / send_file → User</code></pre>
           </div>
 
           <p>
-            例如，我在长期论文工作中积累了检索文献、设计实验、保存结果、编写 LaTeX、生成 PDF 和制作汇报材料的一整套工作流，最后把它人工沉淀为 Researcher Role。这个例子能证明 Role 可以从真实使用中长出来，但不能倒过来说它是自进化系统自动生成的：当时完整的候选验收链还没有建立。
+            Researcher Role 就来自我长期写论文时用的一组流程：检索文献、设计实验、保存结果、编写 LaTeX、生成 PDF 和制作汇报材料。它是我手工整理的，当时还没有完整的候选验收链。
           </p>
 
           <p>
-            Role / Skill 分层解决的是能力如何组织与复用；它还没有回答另一个更难的问题：这次能跑通，换一个模型、Prompt、Skill 或 Runtime 版本后，还能不能跑通？
+            角色和流程能复用之后，还要检查后续修改会不会破坏它们。换了模型、Prompt 或 Skill，原来跑通的任务需要再跑一遍。
           </p>
 
-          <h2>跑成功之后，为什么还需要 Trace 与 Replay</h2>
+          <h2>用 Trace 留下过程，再用 Replay 重跑</h2>
 
           <p>
-            企业试点之后，我开始意识到，一次成功只能证明“这次没有失败”，不能证明系统稳定。Agent 的结果同时受模型采样、上下文、工具响应和环境状态影响，普通单元测试只能覆盖确定性代码，不能替代行为评测。
+            企业试点后，稳定性成了更明显的问题。同一个任务的结果会受模型采样、上下文、工具响应和环境影响，需要把运行过程保存下来，才能比较前后版本。
           </p>
 
           <p>
-            当前架构合同把状态区分成四层：用户可见的 Conversation Journal、可恢复的 Durable Session、发给模型的 Provider Transcript，以及记录本轮输入、Subagent、Tool、Artifact、异常和交付的 Trace。Conversation Journal 是后续补上的用户事实层，四层在部分历史与兼容路径上的严格物理分离仍在推进；但概念上不能再把它们混成一份“万能历史”，因为恢复、模型上下文和评测证据回答的是不同问题。
+            我把原来混在一起的历史拆成四种用途：Conversation Journal 保存用户可见对话，Durable Session 保存恢复状态，Provider Transcript 是实际发给模型的内容，Trace 记录本轮工具、Subagent、产物、异常和交付。历史兼容路径上还没完全分开，但后续实现按这四种用途组织。
           </p>
 
           <p>在此基础上，回归链路收敛为：</p>
@@ -249,10 +234,10 @@ Outcome: pass / fail / blocked</code></pre>
             Replay 的职责只是重新执行 Case 并产生 fresh Trace，不负责宣布成功。Verifier 按 Case 声明检查 Registry 已支持的硬事实；当前默认覆盖 Trace 是否存在、Tool 是否失败和只读边界，Artifact 或 Delivery 检查需要由具体 Case 显式配置。硬检查通过后，ReviewerCat 才判断语义质量。确定性规则负责事实，语义评审负责开放式质量，两者不能互相越权。
           </p>
 
-          <h2>固定 Case 看不到真实用户</h2>
+          <h2>再用模拟用户找没写进 Case 的问题</h2>
 
           <p>
-            Case 仍然有一个天然缺点：它通常由开发者编写，只能覆盖开发者已经想到的问题。真实用户的表达会更模糊，会遗漏背景，也会在多轮对话中改变要求。因此 xiaobaOS 又增加了 Arena，让 UserCat 按 Scenario 与被测 Agent 自然互动，再由 InspectorCat 从普通 Trace 中提取可复现的 Finding 和 Case。
+            固定 Case 通常只能覆盖已经想到的问题。为了补充模糊表达、背景缺失和中途改要求等情形，我加了 Arena：UserCat 按 Scenario 与被测 Agent 多轮互动，InspectorCat 再从 Trace 提取可以复现的 Finding 和 Case。
           </p>
 
           <pre class="article-flow" aria-label="xiaobaOS Arena 场景探索链路"><code>Scenario
@@ -266,10 +251,10 @@ InspectorCat → Finding + Case
               shared Evaluation</code></pre>
 
           <p>
-            这也不是 Arena 一开始就拥有的边界。初版同时承担 Scenario、Scorecard、Candidate 验收和可选发布，结果与 Evaluation、自进化控制层重复。后来我删除独立 Scorecard Worker、人工 Promotion 和重复 Replay 路径，才把它收敛成当前职责：<strong>Arena 负责发现未知问题，不拥有另一套评审器，也不负责发布 Candidate。</strong>所有新 Case 最终仍进入同一条 Evaluation 链，避免系统同时维护两份互相冲突的“成功真相”。
+            Arena 初版还管 Scorecard、Candidate 验收和可选发布，与 Evaluation 和自进化重复。我后来删掉独立 Scorecard Worker、人工 Promotion 和重复的 Replay 路径。现在 Arena 负责发现问题，新 Case 仍走共享 Evaluation，发布由自进化控制层处理。
           </p>
 
-          <h2>从“会生成 Skill”到可治理进化</h2>
+          <h2>生成的新能力，先验收再启用</h2>
 
           <p>
             xiaobaCLI 很早就出现过名为 self-evolution 的 Skill：它可以生成新的 Skill 和 Python Tool，但会直接写入生产目录。那时的“进化”只证明系统会生成能力，没有回答生成物是否正确、是否优于当前版本、失败后如何保持生产版本不变。
@@ -297,13 +282,13 @@ Existing failed Case ───────────────────�
           </p>
 
           <p>
-            这套机制证明的是“变化受到治理”，不是“系统已经越用越好”。真正的长期收益仍需要更多线上 Trace、独立 Case 和跨版本数据验证。对我而言，先建立发布权和证据边界，再讨论自动增长，比先画一张宏大的自进化 DAG 更重要。
+            这条链解决的是候选怎么验收和启用。它能不能带来长期收益，还要用更多线上 Trace、独立 Case 和跨版本结果来判断。
           </p>
 
-          <h2>为什么最终改名为 xiaobaOS</h2>
+          <h2>为什么后来叫 xiaobaOS</h2>
 
           <p>
-            当项目开始统一管理入口、会话、后台任务、角色、技能、工具、交付证据与评测时，它已经不再只是一个 CLI，我也因此把它正式改名为 xiaobaOS。改名并不代表架构已经完成：Arena 的职责收缩、共享 Test / Eval 和更严格的状态边界，都是此后继续发生的纠偏。“模型是 CPU，Runtime 像操作系统”更像一条工作约束，而不是项目一开始的宣言。
+            项目逐渐接管了入口、会话、后台任务、角色、技能、交付和评测，我就把它改名为 xiaobaOS。之后仍在调整结构：Arena 收缩职责，Test / Eval 合并复用，几种状态也继续拆分。下面这个操作系统类比，只是帮助说明各部分的分工。
           </p>
 
           <div class="article-table-wrap" tabindex="0" role="region" aria-label="操作系统与 xiaobaOS 的对应关系">
@@ -352,7 +337,7 @@ Existing failed Case ───────────────────�
           <h2>还没有解决的问题</h2>
 
           <p>
-            一篇工程复盘如果只写已经成立的部分，很容易再次变成架构宣传。当前维护中的真实 Agent CaseSet 只有 3 条只读 Case，它证明共享评测链能够运行，不证明系统已经覆盖广泛能力；需要写工作区的 Replay 和 Source Candidate 原生沙箱目前只在 macOS 可用，其他平台会 fail closed。
+            写这篇时，维护中的真实 Agent CaseSet 只有 3 条只读 Case，主要用来检查共享评测流程，还覆盖不了广泛能力。需要写工作区的 Replay 和 Source Candidate 原生沙箱只在 macOS 可用，其他平台会 fail closed。
           </p>
 
           <p>
@@ -360,11 +345,7 @@ Existing failed Case ───────────────────�
           </p>
 
           <p>
-            这些问题不会因为项目改名为 OS 自动消失。相反，OS 这个名字真正带来的约束，是每增加一种能力，都要继续回答：状态由谁保存，副作用由谁确认，失败如何恢复，变化凭什么发布。
-          </p>
-
-          <p>
-            xiaobaOS 不是因为组件足够多才叫 OS，而是因为它开始统一管理入口、会话、任务、能力、交付证据与版本变化。前半段由真实工作逼出，后半段在一次次过度设计和边界纠偏中收敛；真正的长期效果，还要继续用运行证据证明。
+            后续要补的仍是这些具体问题：让后台任务能恢复，检查文件和消息有没有交付，再增加足够的 Case 验证版本变化。名字已经改了，工作还得一项项做。
           </p>
         </div>
       </article>
