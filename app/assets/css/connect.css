@@ -1,0 +1,14 @@
+@layer components {
+  .connect-menu { position: relative; width: fit-content; }
+  .connect-chevron { transition: transform .18s ease; }
+  .connect-chevron.is-open { transform: rotate(180deg); }
+  .connect-panel { position: absolute; top: 100%; right: 0; z-index: 120; min-width: 200px; padding-top: 6px; }
+  .connect-links { display: grid; padding: 8px; border: 1px solid var(--ink); background: var(--ink); color: var(--bg); box-shadow: var(--shadow-dropdown); }
+  .connect-links a { display: flex; align-items: center; justify-content: space-between; gap: 30px; padding: 11px 12px; font: 400 15px/1.4 var(--font-sans); text-decoration: none; }
+  .connect-links a:hover, .connect-links a:focus-visible { background: var(--bg); color: var(--ink); outline: none; }
+  .terminal-sidebar .connect-panel { top: auto; bottom: 100%; right: auto; left: 0; padding-top: 0; padding-bottom: 6px; }
+  @media(max-width: 760px) {
+    .terminal-sidebar .connect-panel { top: 100%; bottom: auto; right: 0; left: auto; padding-top: 6px; padding-bottom: 0; }
+  }
+  @media(prefers-reduced-motion: reduce) { .connect-chevron { transition: none; } }
+}

@@ -1,0 +1,56 @@
+@layer components {
+  .xiaoba-mascot { display: inline-block; position: relative; flex-shrink: 0; vertical-align: middle; max-width: 100%; }
+  .xiaoba-mascot canvas, .xiaoba-mascot img { display: block; width: 100%; height: 100%; object-fit: contain; }
+  .site-header .brand { min-width: 64px; min-height: 64px; align-items: center; }
+  .terminal-brand { display: inline-flex; }
+  .project-cat { display: flex; align-items: center; justify-content: center; min-height: 230px; padding: 6px 0; }
+  .home-feed .post-row { grid-template-columns: clamp(182px, 25%, 220px) minmax(0, 1fr) 100px; align-items: start; }
+  .post-leading { display: flex; align-items: center; gap: 14px; min-width: 0; padding-right: 16px; }
+  .post-leading .post-date { padding: 3px 0 0; font-size: 14px; }
+  .article-cat { display: flex; flex: none; justify-content: center; align-items: center; width: 36px; height: 32px; pointer-events: none; }
+  .article-cat .xiaoba-mascot { max-width: none; }
+  .article-mark { display: block; flex: none; color: var(--muted); }
+  .article-emblem { display: inline-flex; width: 96px; height: 96px; flex: none; align-items: center; justify-content: center; background: var(--accent); color: var(--bg); overflow: hidden; }
+  .article-emblem .article-mark { display: block; width: 72px; height: 72px; color: inherit; }
+  .article-brandline { display: flex; align-items: flex-end; gap: 18px; margin-bottom: 28px; }
+  .article-brandline .article-emblem { width: 80px; height: 80px; }
+  .article-brandline .article-mark { width: 60px; height: 60px; }
+  .article-brandline .badge { margin-bottom: 0; }
+  .article-mark.is-animated > g { transform-box: fill-box; transform-origin: center; animation: emblem-breathe 4.8s ease-in-out infinite; }
+  .article-mark.is-animated .mark-detail { animation: emblem-signal 3.2s ease-in-out infinite; }
+  .article-mark.is-animated .mark-eyes { transform-box: fill-box; transform-origin: center; animation: emblem-blink 5.2s ease-in-out infinite; }
+  @keyframes emblem-breathe { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-.6px); } }
+  @keyframes emblem-signal { 0%, 30%, 100% { opacity: 1; } 50% { opacity: .35; } 70% { opacity: 1; } }
+  @keyframes emblem-blink { 0%, 43%, 49%, 100% { transform: scaleY(1); } 46% { transform: scaleY(.12); } }
+  @media (prefers-reduced-motion: reduce) {
+    .article-mark.is-animated > g, .article-mark.is-animated .mark-detail, .article-mark.is-animated .mark-eyes { animation: none; }
+  }
+  .featured .post-leading { flex-direction: column; align-items: flex-start; gap: 10px; }
+  .featured .article-cat { width: 96px; height: 96px; background: var(--raised); transform: none; }
+  .featured .article-cat > .article-mark { display: none; }
+  @media (min-width: 641px) and (max-width: 1000px) {
+    .home-feed .post-row { grid-template-columns: 182px minmax(0, 1fr) 68px; }
+    .home-feed .minutes-long { display: none; }
+    .home-feed .minutes-short { display: inline; }
+  }
+  @media (max-width: 640px) {
+    .home-feed .post-row, .home-feed .post-row.featured { display: grid; grid-template-columns: 36px minmax(0, 1fr) auto; gap: 8px 12px; }
+    .post-leading, .featured .post-leading { display: contents; }
+    .post-leading .article-cat { grid-column: 1; grid-row: 1/3; align-self: start; }
+    .post-leading .post-date { grid-column: 2; grid-row: 2; padding: 0; font-size: 12px; }
+    .post-row .post-title, .featured .post-title { grid-column: 2/4; grid-row: 1; width: auto; order: 0; }
+    .post-row .post-duration, .featured .post-duration { grid-column: 3; grid-row: 2; position: static; align-self: baseline; text-align: right; font-size: 12px; }
+    .featured .article-cat { width: 36px; height: 42px; background: transparent; }
+    .featured .article-emblem { display: none; }
+    .featured .article-cat > .article-mark { display: block; }
+    .article-brandline { gap: 14px; margin-bottom: 22px; }
+    .article-brandline .article-emblem { width: 72px; height: 72px; }
+    .article-brandline .article-mark { width: 54px; height: 54px; }
+    .featured .badge { position: static; margin-bottom: 8px; }
+    .featured .post-byline { padding-right: 0; }
+  }
+  @media (max-width: 760px) {
+    .site-header .brand .xiaoba-mascot { width: 58px !important; height: 63px !important; }
+    .project-cat { min-height: 210px; }
+  }
+}

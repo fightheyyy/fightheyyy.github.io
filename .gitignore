@@ -1,1 +1,22 @@
-.codex-artifacts/
+node_modules/
+.nuxt/
+.output/
+.data/
+.env
+.env.*
+!.env.example
+playwright-report/
+test-results/
+.DS_Store
+
+# Local design investigation and browser captures (preserved on disk)
+references/
+artifacts/
+docs/design-reference.md
+docs/starter-brief.md
+docs/implementation.md
+docs/motion-review.md
+scripts/build-reference-gallery.py
+
+/dist
+.playwright-cli/

@@ -1,0 +1,58 @@
+@theme {
+  --breakpoint-navigation: 62.5rem;
+  --color-*: initial;
+  --font-sans: 'Geist Variable', 'Noto Sans SC Variable', 'PingFang SC', 'Microsoft YaHei UI', 'Microsoft YaHei', sans-serif;
+  --font-mono: 'Geist Mono Variable', 'Noto Sans SC Variable', 'PingFang SC', 'Microsoft YaHei UI', monospace;
+}
+:root {
+  /* SVG luminance mask constants: reveal and cut out, independent of theme. */
+  --mask-reveal: white;
+  --mask-cutout: black;
+  --bg: #f6f6f1;
+  --raised: #f0f0ea;
+  --ink: #20201d;
+  --body: #53534c;
+  --muted: #5b5a53;
+  --faint: #a5a39a;
+  --line: #20201d20;
+  --accent: #2457e6;
+  --gutter: 36px;
+  --selection: #2457e626;
+  --overlay: #0005;
+  --shadow-dropdown: 0 10px 25px #0001;
+  --shadow-finder: 0 35px 90px #0005;
+  --ease: cubic-bezier(0.19, 1, 0.22, 1);
+  --dream-sun: #e3a164;
+  --dream-cloud: #a9bccd;
+  --dream-star: #b6a1c9;
+  --dream-moon: #d3c6a0;
+  --dream-grass: #8ca883;
+  --dream-petal: #d9a49a;
+  --dream-face: #faf9f5;
+  --dream-line: #cdd5c4;
+  --dream-mist: #c5c6c4;
+  color-scheme: light;
+}
+:root.dark {
+  --bg: #141413;
+  --raised: #1e1e1b;
+  --ink: #f5f4ef;
+  --body: #b8b6ad;
+  --muted: #aaa79e;
+  --faint: #66645e;
+  --line: #f5f4ef20;
+  --accent: #df8c6c;
+  color-scheme: dark;
+}
+@theme inline {
+  --color-surface: var(--bg);
+  --color-raised: var(--raised);
+  --color-foreground: var(--ink);
+  --color-body: var(--body);
+  --color-muted: var(--muted);
+  --color-faint: var(--faint);
+  --color-border: var(--line);
+  --color-accent: var(--accent);
+  --color-action: var(--ink);
+  --color-action-foreground: var(--bg);
+}

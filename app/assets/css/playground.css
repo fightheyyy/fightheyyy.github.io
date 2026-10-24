@@ -1,0 +1,60 @@
+@layer components {
+  .cat-dream { position: relative; width: 100%; height: clamp(330px, 43vw, 560px); margin-top: 48px; overflow: hidden; isolation: isolate; }
+  .dream-landscape { position: absolute; width: min(80%, 1120px); height: 100%; left: 50%; top: 0; transform: translateX(-50%); overflow: visible; }
+  .dream-horizon, .dream-far-hill { stroke: var(--dream-line); stroke-width: 1; }
+  .dream-far-hill { opacity: .45; }
+  .dream-dust { stroke: var(--dream-mist); fill: var(--dream-mist); stroke-width: 1; }
+  .dream-sun-body { fill: var(--dream-sun); }
+  .dream-rays { stroke: var(--dream-sun); stroke-width: 1.5; stroke-linecap: round; transform-box: fill-box; transform-origin: center; }
+  .dream-cloud-body { fill: var(--dream-cloud); }
+  .dream-star-body { fill: var(--dream-star); }
+  .dream-moon-body { fill: var(--dream-moon); }
+  .dream-moon-eye { stroke: var(--dream-face); stroke-width: 1.5; stroke-linecap: round; }
+  .dream-eyes { fill: var(--dream-face); transform-box: fill-box; transform-origin: center; }
+  .dream-grass-body, .dream-stem { fill: var(--dream-grass); }
+  .dream-stem { stroke: var(--dream-grass); stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+  .dream-petal-body { fill: var(--dream-petal); }
+  .dream-petal-heart { fill: var(--dream-sun); }
+  .dream-flower-stem { stroke: var(--dream-grass); stroke-width: 1.5; }
+  .dream-cat-shadow { fill: var(--dream-line); opacity: .35; }
+  .dream-meadow-details { stroke: var(--dream-grass); fill: var(--dream-grass); stroke-width: 1; opacity: .55; }
+  .dream-traveler { width: 84px; height: 91px; }
+  .dream-traveler .xiaoba-mascot { transform-origin: 50% 82%; transition: transform .55s ease-in-out; }
+  .dream-sun, .dream-cloud, .dream-star, .dream-moon, .dream-grass, .dream-sprout, .dream-petal { transform-box: fill-box; transform-origin: center; scale: .48; }
+  .dream-grass, .dream-sprout, .dream-petal { transform-origin: bottom center; }
+  .is-awake .dream-cloud { animation: dream-drift 14s ease-in-out infinite; }
+  .is-awake .dream-star { animation: dream-star-turn 11s ease-in-out infinite; }
+  .is-awake .dream-moon { animation: dream-drift 12s ease-in-out -4s infinite; }
+  .is-awake .dream-rays { animation: dream-sun-turn 80s linear infinite; }
+  .is-awake .dream-grass, .is-awake .dream-sprout { animation: dream-sway 8s ease-in-out infinite; }
+  .is-awake .dream-sprout { animation-delay: -3s; }
+  .is-awake .dream-petal { animation: dream-sway 9s ease-in-out infinite; }
+  .is-awake .dream-eyes { animation: dream-blink 7s ease-in-out infinite; }
+  .dream-cloud .dream-eyes { animation-delay: -2.5s; }
+  .dream-grass .dream-eyes { animation-delay: -4s; }
+  @keyframes dream-drift { 0%, 100% { translate: 0 0; } 50% { translate: 10px -5px; } }
+  @keyframes dream-star-turn { 0%, 100% { rotate: -7deg; translate: 0 0; } 50% { rotate: 7deg; translate: 0 -7px; } }
+  @keyframes dream-sun-turn { to { rotate: 360deg; } }
+  @keyframes dream-sway { 0%, 100% { rotate: -3deg; } 50% { rotate: 4deg; } }
+  @keyframes dream-blink { 0%, 44%, 49%, 100% { scale: 1 1; } 46% { scale: 1 .12; } }
+  @media (max-width: 760px) {
+    .cat-dream { height: 350px; margin-top: 32px; }
+  }
+  @media (max-width: 480px) {
+    .cat-dream { height: 310px; }
+    .dream-landscape { width: 560px; }
+    .dream-sun-anchor { transform: translate(46px, -143px); }
+    .dream-cloud-anchor { transform: translate(-470px, -130px); }
+    .dream-moon-anchor { transform: translate(-50px, -300px); }
+    .dream-star-anchor { transform: translate(67px, -238px); }
+    .dream-grass { transform: translate(70px, 0); }
+    .dream-petal { transform: translate(220px, 0); }
+    .dream-sprout { transform: translate(-120px, 0); }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .dream-traveler .xiaoba-mascot { transition: none; }
+    .cat-dream.is-awake .dream-cloud, .cat-dream.is-awake .dream-star, .cat-dream.is-awake .dream-moon,
+    .cat-dream.is-awake .dream-rays, .cat-dream.is-awake .dream-grass, .cat-dream.is-awake .dream-sprout,
+    .cat-dream.is-awake .dream-petal, .cat-dream.is-awake .dream-traveler, .cat-dream.is-awake .dream-eyes { animation: none; }
+  }
+}

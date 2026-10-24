@@ -1,0 +1,69 @@
+@layer base {
+  :root {
+    --font-sans: 'Nunito Sans Variable', '975Maru SC', 'Noto Sans SC Variable', 'PingFang SC', 'Microsoft YaHei UI', sans-serif;
+    --font-mono: 'Geist Mono Variable', 'Noto Sans SC Variable', 'PingFang SC', 'Microsoft YaHei UI', monospace;
+  }
+  body {
+    font-synthesis: none;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+  }
+}
+
+@layer components {
+  #intro, #blog, #projects { scroll-margin-top: 32px; }
+  .intro-rail h1 { font-size: 32px; line-height: 1.1; letter-spacing: -.035em; font-weight: 600; }
+  .intro-rail p { font-size: 21px; line-height: 1.6; letter-spacing: 0; }
+  .intro-footnote { font-size: 12px; line-height: 1.7; }
+  .desktop-nav { font-size: 13px; font-weight: 400; letter-spacing: 0; }
+  .category-button { font-size: 13px; letter-spacing: 0; }
+  .home-feed .post-row { grid-template-columns: clamp(125px, 21%, 170px) minmax(0, 1fr) 100px; padding-block: 21px; }
+  .post-title h2 { font-size: 20px; line-height: 1.6; letter-spacing: 0; font-weight: 600; }
+  .section-heading h2 { font-weight: 600; }
+  .project-heading, .prose h2.project-index-name { font-weight: 700; }
+  .project-showcase .workbench-list .project-name { font-weight: 700; color: var(--ink); }
+  .featured .post-title h2 { font-size: clamp(31px, 2.6vw, 35px); line-height: 1.4; letter-spacing: 0; font-weight: 600; text-wrap: pretty; }
+  .home-feed .post-row.featured { padding-block: 23px 28px; }
+  .featured .post-byline { margin-top: 16px; font: 400 15px/1.6 var(--font-sans); gap: 16px; }
+  .featured .post-byline > span { font: 13px/1.6 var(--font-mono); }
+  .post-date, .post-duration { font-size: 15px; line-height: 1.7; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .post-date { padding-top: 2px; }
+  .post-duration { font-size: 14px; padding-top: 2px; }
+  .rail-title { font: 500 16px/1.6 var(--font-sans); }
+  .article-hero h1 { font-size: clamp(32px, 2.9vw, 40px); font-weight: 600; letter-spacing: 0; line-height: 1.45; }
+  .prose { font-size: 19px; line-height: 1.85; letter-spacing: 0; }
+  .prose p { margin-bottom: 24px; }
+  .prose h2 { font: 600 23px/1.55 var(--font-sans); letter-spacing: -0.02em; }
+  .prose h3 { font: 600 19px/1.6 var(--font-sans); letter-spacing: -0.01em; }
+  .prose h4 { font-weight: 600; }
+  .prose strong, .prose b, .prose th { font-weight: 600; color: var(--ink); }
+  .contents-tree a { font-size: 13px; line-height: 1.7; }
+  .terminal-shell { font-size: 16px; line-height: 1.6; letter-spacing: 0; }
+  .terminal-post { font-size: 16px; line-height: 1.6; }
+  .terminal-post-time { font-size: 14px; }
+  .terminal-intro p { font-size: 16px; line-height: 1.7; }
+  .terminal-help button, .terminal-suggestions button { font-size: 14px; line-height: 1.6; }
+  @media (min-width: 641px) and (max-width: 1000px) {
+    .home-grid { padding-top: 42px; }
+    .intro-rail { margin-bottom: 52px; }
+    .intro-rail h1 { margin-bottom: 18px; }
+    .home-feed .post-row { grid-template-columns: 128px minmax(0, 1fr) 90px; }
+    .featured .post-title h2 { font-size: 32px; }
+  }
+  @media (max-width: 640px) {
+    .home-grid { padding-top: 38px; }
+    .intro-rail { margin-bottom: 48px; }
+    .home-feed .post-row { padding-block: 19px; }
+    .home-feed .post-row.featured { grid-template-columns: 1fr auto; padding-block: 20px 25px; }
+    .post-title h2 { font-size: 19px; line-height: 1.6; }
+    .featured .post-title h2 { font-size: 28px; line-height: 1.45; }
+    .post-date, .post-duration { font-size: 12px; padding-top: 0; }
+    .prose { font-size: 18px; line-height: 1.9; }
+    .prose h2 { font-size: 21px; }
+    .prose h3 { font-size: 18px; }
+    .featured .post-byline { font-size: 14px; }
+    .intro-rail p { font-size: 20px; }
+    .terminal-post, .terminal-intro p { font-size: 14px; }
+    .terminal-help button, .terminal-suggestions button { font-size: 12px; }
+  }
+}

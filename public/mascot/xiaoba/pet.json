@@ -1,0 +1,17 @@
+{
+  "id": "xiaoba",
+  "displayName": "XiaoBa",
+  "description": "A solid cobalt-blue XiaoBa cat with white capsule eyes, asymmetric ears and a curled tail.",
+  "renderer": "grok-cat-v1",
+  "roleThemes": {
+    "base": { "body": "#2457E6", "eyes": "#FFFFFF", "outline": null },
+    "user-cat": { "body": "#E76F51", "eyes": "#281A12" },
+    "inspector-cat": { "body": "#3A86FF", "eyes": "#FFFDF7" },
+    "reviewer-cat": { "body": "#8338EC", "eyes": "#FFFDF7" },
+    "engineer-cat": { "body": "#2A9D78", "eyes": "#FFFDF7" },
+    "browser-cat": { "body": "#19A7CE", "eyes": "#14272D" },
+    "gui-cat": { "body": "#E85D9E", "eyes": "#2B1721" },
+    "secretary-cat": { "body": "#F4A261", "eyes": "#2B1C12" },
+    "evolution-cat": { "body": "#74A94A", "eyes": "#17220F" }
+  }
+}

@@ -1,0 +1,99 @@
+@layer classic, components;
+@import url("styles.css?v=20260824-1") layer(classic);
+
+@font-face {
+  font-family: "Geist Mono Variable";
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url("assets/fonts/geist-mono-latin-wght-normal.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Nunito Sans Variable";
+  font-style: normal;
+  font-weight: 200 900;
+  font-display: swap;
+  src: url("assets/fonts/nunito-sans-latin-wght-normal.woff2") format("woff2");
+}
+
+@layer components {
+  .classic-site-header {
+    --ink: #20201d;
+    --muted: #5b5a53;
+    --line: #20201d20;
+    --shadow-dropdown: 0 10px 25px #0001;
+    --font-mono: "Geist Mono Variable", monospace;
+    --font-sans: "Nunito Sans Variable", "PingFang SC", "Microsoft YaHei UI", sans-serif;
+    position: relative;
+    z-index: 10;
+    display: grid;
+    grid-template-columns: 2fr 8fr auto;
+    align-items: center;
+    gap: 20px;
+    width: 100%;
+    max-width: 1800px;
+    min-height: 102px;
+    margin: auto;
+    padding: 28px 36px 20px;
+    color: var(--ink);
+    font: 400 16px/1.4 var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+  }
+  .classic-site-header a { color: inherit; text-decoration: none; }
+  .classic-brand { display: flex; align-items: center; width: fit-content; }
+  .classic-mascot { display: block; position: relative; width: 72px; height: 78px; }
+  .classic-mascot img, .classic-mascot canvas { display: block; width: 100%; height: 100%; object-fit: contain; }
+  .classic-site-header [hidden] { display: none; }
+  .classic-nav {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    align-items: center;
+    font: 400 13px/1.4 var(--font-mono);
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  .classic-nav a { width: fit-content; white-space: nowrap; }
+  .classic-nav a:hover, .classic-nav a[aria-current] { color: var(--ink); }
+  .classic-nav a span { color: var(--muted); }
+  .classic-header-actions { display: flex; align-items: center; gap: 16px; }
+  .classic-site-header button { cursor: pointer; border: 0; border-radius: 0; }
+  .classic-contact { position: relative; }
+  .classic-contact-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 24px;
+    min-height: 38px;
+    padding: 7px 17px;
+    background: var(--ink);
+    color: var(--bg);
+    font: 700 15px/1.4 var(--font-sans);
+  }
+  .classic-contact-button:hover { opacity: .8; }
+  .classic-contact-button svg { transition: transform .18s ease; }
+  .classic-contact-button[aria-expanded="true"] svg { transform: rotate(180deg); }
+  .classic-contact-panel { position: absolute; top: 100%; right: 0; z-index: 120; min-width: 200px; padding-top: 6px; }
+  .classic-contact-links { display: grid; padding: 8px; border: 1px solid var(--ink); background: var(--ink); color: var(--bg); box-shadow: var(--shadow-dropdown); }
+  .classic-contact-links a { display: flex; align-items: center; justify-content: space-between; gap: 30px; padding: 11px 12px; font: 400 15px/1.4 var(--font-sans); }
+  .classic-contact-links a:hover, .classic-contact-links a:focus-visible { background: var(--bg); color: var(--ink); outline: none; }
+  .classic-menu-toggle { display: none; align-items: center; justify-content: center; width: 38px; height: 38px; padding: 0; background: none; color: var(--ink); }
+  .classic-menu-close { display: none; }
+  .classic-menu-toggle[aria-expanded="true"] .classic-menu-open { display: none; }
+  .classic-menu-toggle[aria-expanded="true"] .classic-menu-close { display: block; }
+  @media (max-width: 1000px) {
+    .classic-site-header { grid-template-columns: 1fr auto; }
+    .classic-nav { display: none; grid-column: 1 / -1; grid-row: 2; gap: 23px; padding: 22px 0 12px; }
+    .classic-site-header[data-menu-open] .classic-nav { display: flex; flex-direction: column; align-items: flex-start; }
+    .classic-header-actions { gap: 8px; }
+    .classic-menu-toggle { display: inline-flex; }
+  }
+  @media (max-width: 760px) {
+    .classic-site-header { gap: 12px; padding: 20px 20px 18px; min-height: 78px; }
+    .classic-mascot { width: 58px; height: 63px; }
+    .classic-header-actions { gap: 6px; }
+    .classic-contact-button { gap: 15px; min-height: 34px; padding: 6px 12px; font-size: 13px; }
+    .classic-menu-toggle { width: 32px; height: 34px; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .classic-contact-button svg { transition: none; }
+  }
+}

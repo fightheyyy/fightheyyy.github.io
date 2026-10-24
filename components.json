@@ -1,0 +1,4 @@
+{
+  "tailwind": { "css": "app/assets/css/main.css" },
+  "aliases": { "ui": "./app/components/ui" }
+}

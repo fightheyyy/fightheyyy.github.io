@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-16 -24 306 274">
+  <defs><linearGradient id="fur" x1="40" y1="0" x2="140" y2="225" gradientUnits="userSpaceOnUse"><stop stop-color="#425F79"/><stop offset=".38" stop-color="#7F9EBA"/><stop offset="1" stop-color="#C5D8E2"/></linearGradient></defs>
+  <path fill="url(#fur)" d="M30 65C39 29 54 0 68 0C82-1 96 23 104 37C105 39 106 40 109 40C119 41 129 44 137 47C155 38 175 33 185 36C194 38 197 46 197 57C198 66 191 70 186 73C183 75 188 80 189 96C190 108 193 110 204 120C221 135 233 158 229 178C240 173 246 158 243 148C240 132 223 126 221 115C217 101 228 89 241 90C259 90 273 111 273 132C276 161 255 188 216 202C194 218 166 223 126 223C75 224 38 220 16 194C-7 167-5 132 8 102C15 86 23 75 30 65Z"/>
+  <g fill="#233A4B"><rect x="47" y="82" width="15" height="34" rx="7.5" transform="rotate(18 54 99)"/><rect x="108" y="97" width="15" height="34" rx="7.5" transform="rotate(18 115 114)"/></g>
+</svg>

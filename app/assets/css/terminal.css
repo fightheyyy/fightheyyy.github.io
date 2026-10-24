@@ -1,0 +1,89 @@
+@layer components {
+  .terminal-shell { min-height: 100dvh; font-family: var(--font-mono); font-size: 15px; line-height: 1.7; }
+  .terminal-sidebar { position: fixed; inset: 0 auto 0 0; display: flex; flex-direction: column; width: 242px; padding: 36px; border-right: 1px solid var(--line); }
+  .terminal-brand { align-self: flex-start; }
+  .terminal-sidebar nav { display: flex; flex-direction: column; gap: 16px; margin-top: auto; padding-top: 60px; padding-bottom: 26px; }
+  .terminal-sidebar nav a { color: var(--muted); text-decoration: none; font-size: 14px; }
+  .terminal-sidebar nav a:hover, .terminal-sidebar nav a[aria-current] { color: var(--ink); }
+  .terminal-start { display: block; color: var(--bg); background: var(--ink); padding: 8px 12px; text-align: center; font-size: 13px; text-decoration: none; }
+  .terminal-main { margin-left: 242px; padding: 40px 36px 24px; max-width: 1540px; outline: none; }
+  .terminal-intro { margin-bottom: 44px; }
+  .terminal-wordmark { width: min(100%, 1020px); color: var(--ink); margin: 0 0 32px; }
+  .terminal-wordmark svg { display: block; width: 100%; height: auto; overflow: visible; }
+  .terminal-intro p { color: var(--body); max-width: 740px; margin: 0; line-height: 1.8; }
+  .terminal-intro button { color: var(--ink); text-decoration: underline; text-underline-offset: 4px; }
+  .terminal-post { display: grid; grid-template-columns: 150px minmax(0, 1fr) 72px; gap: 0; align-items: baseline; padding: 7px 0; text-decoration: none; transition: opacity .2s, filter .2s; }
+  .terminal-post-meta { color: var(--muted); font-size: 14px; }
+  .terminal-post-meta > span { font-size: 11px; margin-left: 8px; }
+  .terminal-post-title { min-width: 0; padding-right: 18px; }
+  .terminal-post-time { color: var(--muted); text-align: right; white-space: nowrap; font-size: 13px; }
+  .terminal-row-number { color: var(--muted); font-size: 11px; }
+  .terminal-featured { padding-bottom: 24px; }
+  .terminal-categories { display: flex; gap: 26px; padding: 15px 0; margin-bottom: 10px; border-block: 1px solid var(--line); overflow-x: auto; }
+  .terminal-categories button { padding: 0; color: var(--muted); font: 12px/1.8 var(--font-mono); text-transform: uppercase; white-space: nowrap; }
+  .terminal-categories button[aria-pressed='true'] { color: var(--ink); }
+  .terminal-feed-end { display: flex; justify-content: space-between; gap: 20px; margin: 14px 0 28px; font-size: 12px; }
+  .terminal-feed-end > span { color: var(--muted); }
+  .terminal-feed-end button { padding-left: 150px; text-align: left; }
+  .terminal-entry { margin-bottom: 26px; }
+  .terminal-command-echo { margin: 0 0 12px; color: var(--muted); }
+  .terminal-command-echo > span { color: var(--accent); }
+  .terminal-response { margin: 8px 0; color: var(--body); max-width: 880px; white-space: pre-wrap; overflow-wrap: anywhere; }
+  .terminal-help button, .terminal-suggestions button { display: grid; grid-template-columns: 140px minmax(0, 1fr); width: 100%; gap: 20px; text-align: left; padding: 7px 10px; }
+  .terminal-help button > span:last-child, .terminal-suggestions button > span:last-child { color: var(--muted); }
+  .terminal-help button:hover, .terminal-suggestions button:hover, .terminal-suggestions button[aria-selected='true'] { background: var(--raised); }
+  .terminal-results a { display: flex; align-items: baseline; justify-content: space-between; gap: 28px; padding: 7px 0; text-decoration: none; }
+  .terminal-results a > span:last-child:not(:first-child) { color: var(--muted); font-size: 12px; white-space: nowrap; }
+  .terminal-results a:hover { color: var(--accent); }
+  .terminal-input-area { position: relative; scroll-margin-block: 40px; }
+  .terminal-prompt { display: flex; align-items: baseline; gap: 10px; border-block: 1px solid var(--line); padding: 14px 0; }
+  .terminal-prompt:focus-within { border-bottom-color: var(--ink); }
+  .terminal-prompt label { flex-shrink: 0; font-size: 14px; }
+  .terminal-chevron { color: var(--accent); margin-left: 5px; }
+  .terminal-prompt input { flex: 1; width: 0; min-width: 0; padding: 0; border: 0; outline: 0; background: transparent; border-radius: 0; color: var(--ink); caret-color: var(--accent); font: 15px/1.7 var(--font-mono); }
+  .terminal-prompt input::placeholder { color: var(--muted); }
+  .terminal-enter { font-size: 19px; padding: 0 5px; color: var(--muted); }
+  .terminal-hints { display: flex; justify-content: space-between; gap: 16px; padding-top: 12px; font-size: 10px; color: var(--muted); }
+  .terminal-suggestions { position: absolute; inset: auto 0 calc(100% + 8px); z-index: 40; max-height: min(440px, 60dvh); overflow-y: auto; overscroll-behavior: contain; border: 1px solid var(--line); background: var(--bg); box-shadow: var(--shadow-dropdown); padding: 5px; margin: 0; font-size: 13px; }
+  .terminal-suggestions button[aria-selected='true'] { background: var(--ink); color: var(--bg); }
+  .terminal-suggestions button[aria-selected='true'] > span:last-child { color: inherit; }
+  @media (hover: hover) {
+    .terminal-post-list:not(:has(:focus-visible)):has(.terminal-post:hover) .terminal-post:not(:hover) { opacity: .3; filter: blur(.65px); }
+  }
+  .terminal-post-list:has(:focus-visible) .terminal-post:not(:focus-visible) { opacity: .3; filter: blur(.65px); }
+  @media (max-width: 1000px) {
+    .terminal-sidebar { width: 190px; padding: 28px 24px; }
+    .terminal-main { margin-left: 190px; padding: 32px 28px 24px; }
+    .terminal-post { grid-template-columns: 118px minmax(0, 1fr) 58px; font-size: 14px; }
+    .terminal-post-meta { font-size: 12px; }
+    .terminal-feed-end button { padding-left: 118px; }
+  }
+  @media (max-width: 760px) {
+    .terminal-sidebar { position: static; width: auto; flex-direction: row; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 20px; padding: 20px; border-right: 0; border-bottom: 1px solid var(--line); }
+    .terminal-sidebar nav { flex-direction: row; order: 3; flex-basis: 100%; justify-content: space-between; gap: 12px; margin: 0; padding: 0; }
+    .terminal-sidebar nav a { font-size: 11px; }
+    .terminal-start { font-size: 12px; }
+    .terminal-main { margin: 0; padding: 32px 20px 24px; }
+    .terminal-wordmark { margin-bottom: 24px; }
+    .terminal-intro { margin-bottom: 30px; font-size: 13px; }
+    .terminal-post { grid-template-columns: minmax(0, 1fr) 58px; row-gap: 5px; padding-block: 10px; }
+    .terminal-post-meta { grid-column: 1/-1; font-size: 11px; }
+    .terminal-post-title { grid-column: 1; line-height: 1.8; padding-right: 12px; }
+    .terminal-post-time { font-size: 11px; }
+    .terminal-categories { gap: 20px; }
+    .terminal-feed-end button { padding: 0; }
+    .terminal-feed-end { font-size: 10px; gap: 12px; }
+    .terminal-prompt { gap: 8px; flex-wrap: wrap; }
+    .terminal-prompt label { font-size: 11px; }
+    .terminal-prompt input { font-size: 16px; }
+    .terminal-user { display: none; }
+    .terminal-hints { font-size: 9px; }
+    .terminal-help button, .terminal-suggestions button { grid-template-columns: 90px minmax(0, 1fr); gap: 12px; font-size: 12px; }
+    .terminal-response { font-size: 13px; }
+    .terminal-results a { flex-wrap: wrap; gap: 2px; font-size: 13px; }
+    .terminal-results a > span:last-child:not(:first-child) { font-size: 11px; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .terminal-post { transition: none; }
+  }
+}

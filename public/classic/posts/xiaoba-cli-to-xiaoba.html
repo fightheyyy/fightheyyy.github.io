@@ -1,0 +1,269 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <script src="../../entry.js?v=dual-view-v1"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="从 XiaoBa-CLI 到 xiaobaOS：为什么用我家猫的名字，已经做了什么，以及距离我想要的小八还差什么。"
+    />
+    <meta property="og:type" content="article" />
+    <meta property="og:title" content="我想做一个什么样的小八" />
+    <meta
+      property="og:description"
+      content="从 XiaoBa-CLI 到 xiaobaOS：为什么用我家猫的名字，已经做了什么，以及距离我想要的小八还差什么。"
+    />
+    <meta
+      property="og:image"
+      content="https://fightheyyy.github.io/assets/posts/xiaoba-journey/xiaoba-cat.jpg"
+    />
+    <meta property="article:published_time" content="2026-07-29" />
+    <title>我想做一个什么样的小八</title>
+    <link rel="canonical" href="https://fightheyyy.github.io/posts/xiaoba-cli-to-xiaoba.html" />
+    <link rel="icon" type="image/png" href="../assets/favicon.png" />
+    <link
+      rel="preload"
+      href="../assets/fonts/syne-latin-wght-normal.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin
+    />
+    <link rel="stylesheet" href="../shared-header.css?v=editorial-nav-v1" />
+    <script src="../shared-header.js?v=editorial-nav-v1" defer></script>
+    <link rel="stylesheet" href="../assets/posts/xiaoba-journey/xiaoba-journey.css?v=20260728-1" />
+  </head>
+  <body class="article-page xiaoba-journey-page">
+    <header class="classic-site-header">
+      <a class="classic-brand" href="../index.html" aria-label="Fightheyyy home">
+        <span class="classic-mascot" aria-hidden="true">
+          <img src="../../mascot/xiaoba/logo.svg?v=solid-cobalt-white-v4" width="192" height="208" alt="" />
+          <canvas width="384" height="416" hidden></canvas>
+        </span>
+      </a>
+      <nav class="classic-nav" id="classic-navigation" aria-label="Main navigation">
+        <a href="../index.html" aria-keyshortcuts="h"><span>[H]</span> Home</a>
+        <a href="../index.html#blog" aria-keyshortcuts="b"><span>[B]</span> Blog</a>
+        <a href="../index.html#projects" aria-keyshortcuts="p"><span>[P]</span> Projects</a>
+        <a href="../../?view=editorial" aria-keyshortcuts="e" aria-label="Switch to the editorial blog"><span>[E]</span> Editorial</a>
+      </nav>
+      <div class="classic-header-actions">
+        <div class="classic-contact">
+          <button class="classic-contact-button" type="button" aria-expanded="false" aria-controls="classic-contact-links">Contact <svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true"><path d="m2 4 4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.2" /></svg></button>
+          <div class="classic-contact-panel" hidden>
+            <nav class="classic-contact-links" id="classic-contact-links" aria-label="联系我">
+              <a href="https://github.com/fightheyyy" target="_blank" rel="noreferrer"><span>GitHub</span><span aria-hidden="true">↗</span></a>
+              <a href="mailto:704159620@qq.com"><span>Email</span><span aria-hidden="true">↗</span></a>
+              <a href="https://www.xiaohongshu.com/user/profile/602417410000000001000ed4" target="_blank" rel="noreferrer"><span>小红书</span><span aria-hidden="true">↗</span></a>
+            </nav>
+          </div>
+        </div>
+        <button class="classic-menu-toggle" type="button" aria-label="Navigation menu" aria-controls="classic-navigation" aria-expanded="false">
+          <svg class="classic-menu-open" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16" /></svg>
+          <svg class="classic-menu-close" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="m6 6 12 12M6 18 18 6" /></svg>
+        </button>
+      </div>
+    </header>
+
+    <main class="article-shell">
+      <article>
+        <header class="article-header xiaoba-journey-header">
+          <p class="article-kicker">XiaoBa · Origin &amp; Direction</p>
+          <h1 aria-label="我想做一个什么样的小八">
+            <span>我想做一个</span>
+            <span>什么样的小八</span>
+          </h1>
+          <p class="article-deck">
+            项目用了我家猫的名字。从命令行工具做到 xiaobaOS，我想让它能记住事情、接着工作，也越来越清楚还有多少基础没做好。
+          </p>
+          <div class="article-meta">
+            <time datetime="2026-07-29">2026.07.29</time>
+            <span>约 7 分钟阅读</span>
+          </div>
+        </header>
+
+        <div class="article-content">
+          <p class="article-lead">
+            小八是我养的猫。页面左上角的照片是它，旁边的像素猫是 xiaobaOS 的 App 图标。项目借用了它的名字。
+          </p>
+
+          <p>
+            我想做的小八，能记住之前聊过什么，知道还有哪些事情没做完。关掉终端、换一个入口，再找到它时，上次的事情还能接着往下做。现在离这个目标还有距离。
+          </p>
+
+          <aside class="article-callout xiaoba-thesis" aria-label="XiaoBa 三阶段命名">
+            <p class="article-callout-title">这三个名字对应不同的打算。</p>
+            <p>
+              XiaoBa-CLI 是最早的命令行版本；xiaobaOS 是正在做的运行环境；等这些基础足够可靠了，我希望只叫它 XiaoBa。
+            </p>
+          </aside>
+
+          <ol class="xiaoba-phases" aria-label="XiaoBa 的三个阶段">
+            <li>
+              <span class="xiaoba-phase-number">01</span>
+              <div>
+                <p class="xiaoba-phase-name">XiaoBa-CLI</p>
+                <p>一个可以理解命令、调用工具并完成任务的 Agent Runtime。</p>
+              </div>
+            </li>
+            <li>
+              <span class="xiaoba-phase-number">02</span>
+              <div>
+                <p class="xiaoba-phase-name">xiaobaOS</p>
+                <p>正在做的运行环境，负责长期任务、电脑操作、运行记录和能力更新。</p>
+              </div>
+            </li>
+            <li>
+              <span class="xiaoba-phase-number">03</span>
+              <div>
+                <p class="xiaoba-phase-name">XiaoBa</p>
+                <p>希望最终做成的小八：记得共同经历，换个入口也能接着相处。</p>
+              </div>
+            </li>
+          </ol>
+
+          <h2>第一阶段：先让它真的能做事</h2>
+
+          <p>
+            2026 年 4 月，我先把模型接进一个 Agent loop，让它能读文件、调用 Shell、使用 Skills，再把结果交回终端。那时要解决的都是执行问题：工具能不能调通，失败了会怎样，任务能不能做完。
+          </p>
+
+          <pre class="article-flow" role="region" aria-label="XiaoBa-CLI 最初的运行方式"><code>命令 → 模型 → Tool → 结果
+
+打开终端时它出现
+任务结束后它离开</code></pre>
+
+          <p>
+            从 CLI 开始，交互简单，可以先集中处理工具调用、错误返回、上下文压缩和日志。后面的记忆和长期任务都要用到这些东西。
+          </p>
+
+          <p>
+            只是任务结束后，程序也就退出了。如果希望小八一直在，就还得保存会话状态、处理后台任务，让下次启动能接上之前的工作。
+          </p>
+
+          <h2>第二阶段：从终端走到桌面和消息里</h2>
+
+          <p>
+            2026 年 7 月，我把项目和仓库改名为 xiaobaOS。那时已经有了终端之外的入口，继续叫 CLI 不太贴切。
+          </p>
+
+          <p>
+            桌面、Pet、CLI、飞书和微信需要共用运行状态。不同的专业能力需要组织起来，执行过程和产出文件要留得住，出错后还要能重跑。这些事逐渐占了开发的大头。
+          </p>
+
+          <div class="article-table-wrap" tabindex="0" role="region" aria-label="XiaoBa-CLI 与 xiaobaOS 的区别">
+            <table>
+              <thead>
+                <tr>
+                  <th>从</th>
+                  <th>走向</th>
+                  <th>需要补上的能力</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>一次命令</td>
+                  <td>长期运行</td>
+                  <td>有时间、状态、中断与恢复</td>
+                </tr>
+                <tr>
+                  <td>一个入口</td>
+                  <td>多个 Surface</td>
+                  <td>在终端、桌面与消息平台保持同一运行边界</td>
+                </tr>
+                <tr>
+                  <td>工具调用</td>
+                  <td>电脑身体</td>
+                  <td>浏览器、GUI、文件和工作平台成为感官与双手</td>
+                </tr>
+                <tr>
+                  <td>运行日志</td>
+                  <td>可验证经历</td>
+                  <td>Trace、Artifact 和交付事实支撑复盘</td>
+                </tr>
+                <tr>
+                  <td>更新代码</td>
+                  <td>更新与验收</td>
+                  <td>把问题保存成 Case，用来验收候选改动</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <p>
+            这里的 OS 指小八的运行环境：接入模型、工具和电脑，管理角色、Skills、记忆与评测。它运行在 Windows 或 macOS 之上。
+          </p>
+
+          <h2>现在最需要做的是整理已有系统</h2>
+
+          <p>
+            按这三个阶段来算，我还在第二阶段。xiaobaOS 已经有不少功能，但用起来、维护起来都还不够顺。
+          </p>
+
+          <p>
+            比如 Replay、Eval、Arena 和自进化分别长出了自己的 Runner、Schema、Decision 和 Scorecard。同一次运行的记录在几层之间反复包装，查一个结果往往要先弄清它是哪一层给出的。
+          </p>
+
+          <pre class="article-flow" role="region" aria-label="xiaobaOS 正在收敛的评测主干"><code>Case → Replay → Trace → Verify → Outcome
+
+Test  = Implementation Correctness
+Eval  = Agent Behavioral Capability
+Arena = Agentic Eval
+Self-Evolution = 发现问题、生成候选、调用评测、等待晋升</code></pre>
+
+          <p>
+            接下来要收掉这些重复实现。Runtime 执行任务，Trace 保存记录，Evaluation 给出评测结果。Arena 发现新问题后复用同一条评测路径，自进化也调用这条路径验收候选改动。
+          </p>
+
+          <h2>我希望以后的小八是什么样</h2>
+
+          <p>
+            将来使用小八时，我希望不必关心背后切换了哪个 Role、挂载了哪个 Skill，也不用知道 Replay 和 Promotion 怎么工作。一次会话换到另一个入口，事情应该能继续。
+          </p>
+
+          <p>具体来说，我希望它能做到这些：</p>
+
+          <ul class="article-list">
+            <li>它记得自己是谁，也记得与你共同经历过什么。</li>
+            <li>它知道答应过哪些事情，哪些目标还没有完成。</li>
+            <li>它可以通过浏览器、桌面、文件和消息平台感知并行动。</li>
+            <li>它知道自己的权限、风险和不确定性，重要动作会询问你。</li>
+            <li>它能把失败变成经验，把重复经验变成能力，同时不随意改写自己的核心。</li>
+            <li>无论你从哪个入口找到它，面对的都是同一个 XiaoBa。</li>
+          </ul>
+
+          <p>
+            我也希望它的能力能逐渐接近 AGI。不过，对这个项目更具体的期待是：小八能长期留在电脑里，记得我们的事情，能做事，也知道什么时候需要我来决定。上面这些仍是目标。
+          </p>
+
+          <h2>为什么是这只猫</h2>
+
+          <p>
+            现实里的小八不会写代码，也不懂 Case 和 Trace。它每天在我身边，有自己的习惯和性格。我熟悉的是这只猫，而不是每次见面都重新开始的一段关系。
+          </p>
+
+          <p>
+            这也是我把它的名字借给项目的原因。我希望电脑里的小八，慢慢也能有这种熟悉感。要做到这一点，先得把那些不太有趣的会话、记忆和恢复问题处理好。
+          </p>
+
+          <div class="article-ending">
+            <p>
+              眼下先把重复的评测路径整理好，让一次任务从执行到验收都能查清楚。之后再谈下一步。
+            </p>
+            <div class="xiaoba-ending-links">
+              <a href="https://github.com/fightheyyy/xiaobaOS" target="_blank" rel="noreferrer">
+                View xiaobaOS on GitHub →
+              </a>
+              <a href="xiaoba-cli-agent-os.html">阅读 xiaobaOS 技术架构文章 →</a>
+            </div>
+          </div>
+        </div>
+      </article>
+
+      <footer class="article-footer">
+        <a href="../index.html#blog">← 返回 Tech Blog</a>
+        <span>fightheyyy.github.io</span>
+      </footer>
+    </main>
+  </body>
+</html>

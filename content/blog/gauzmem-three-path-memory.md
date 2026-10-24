@@ -1,0 +1,141 @@
+---
+title: "GauzMem：给检索到的记忆补上原文和上下文"
+description: "一条相关的摘要，常常还不够回答问题。GauzMem 用 Qdrant 找候选事实，再用 Neo4j 和 MySQL 补上关系、前后对话与原始出处。"
+date: "2026-07-17"
+author: "Fightheyyy"
+category: "Agents"
+tags: ["Agent Memory","Retrieval Architecture"]
+featured: false
+draft: false
+readingMinutes: 9
+---
+
+假设用户说过：“发布推迟到周五，因为支付集成还需要一次审查。”过几天再问为什么改期，检索到这句话还不够：后面是否又改了日期？审查最终过了没有？如果只拿回一条摘要，Agent 很容易漏掉这些变化。
+
+GauzMem 围绕这类问题设计召回：先找相关事实，再补上关系和前后对话，每条事实都保留回到原文的路径。下面按一次查询的过程解释。
+
+::note-figure
+---
+caption: "图 1：语义检索找到候选事实，图谱和时序查询补充上下文。点击查看原图。"
+label: FIG.
+---
+[![GauzMem 三路召回概览：语义召回、图谱扩展和时序扩展合并为可追溯的 Recall Bundle。](/classic/assets/posts/gauzmem/hero.png)](/classic/assets/posts/gauzmem/hero.png)
+::
+
+## 检索到一句相关的话以后
+
+向量检索可以找到与“发布日期变化”相关的内容。要回答完整，还需要取回对应原文、后续讨论，以及相关事实之间的联系。这些需要额外的数据组织和查询。
+
+这类缺口通常分成三种：
+
+-   **证据缺口**：Fact 是模型提炼的，必须能回到原始 Chunk，避免把派生内容当作原话。
+-   **关系缺口**：相似不等于因果、支持、矛盾或条件，很多“为什么”问题需要沿关系继续找。
+-   **时间缺口**：对话的前后轮次往往比另一条高相似文本更重要，顺序本身就是信息。
+
+## 先让摘要能查回原文
+
+```text
+Source → Chunk → Fact → Entity / Relation → Topic
+           ↑        ↑
+        原始证据   可检索的原子记忆
+```
+
+Source 表示一段对话、一个文档或一次上传；Chunk 保存原始文本、轮次和创建时间；Fact 是从 Chunk 中提取的原子结论。Entity、Relation 和 Topic 都是基于 Fact 继续构建的检索投影。
+
+| 对象 | 保存什么 | 为什么需要 |
+| --- | --- | --- |
+| Source | 来源与导入边界 | 区分对话、文档和文件 |
+| Chunk | 原文、turn、created\_at | 保留原文及其出现顺序 |
+| Fact | 原子化结论与 chunk\_id | 提供稳定的检索和扩展种子 |
+| Entity / Relation | 事实之间的结构化联系 | 支持多跳关系召回 |
+| Topic | 一组相关事实的高层摘要 | 补充跨片段的长期主题 |
+
+`Fact.chunk_id` 把提取出的事实连回原始 Chunk。即使 Fact 的措辞经过模型改写，也能查到用户当时说了什么。这条关联同时也是时序扩展的入口。
+
+## 一次查询怎样经过三条路径
+
+::note-figure
+---
+caption: "图 2：三条路径共享同一批 seed Fact IDs，但扩展依据不同。手机端可左右滑动，或点击查看原图。"
+label: FIG.
+---
+[![查询先在 Qdrant 中找到带 Fact ID 的语义种子，再分别进入语义、Neo4j 图谱和 MySQL 时序路径，最后合并去重并保留来源、路径和时间。](/classic/assets/posts/gauzmem/three-path-recall.png)](/classic/assets/posts/gauzmem/three-path-recall.png)
+::
+
+### 第一路：Qdrant 找到语义种子
+
+查询先被转换成 Embedding，再从 conversation、Fact 和 Topic 三类向量中召回候选。Qdrant 在这里解决的是候选发现：把搜索空间快速收敛到一批相关内容，并且保留 seed Fact IDs，供后续两条路径继续工作。
+
+这一步的命中结果会进入最终返回值。其中的 seed Fact IDs 还会交给图谱和时序查询，作为后续扩展的起点。
+
+### 第二路：Neo4j 补回关系
+
+GauzMem 把 Fact 之间的 CAUSE、TEMPORAL、SUPPORT、ELABORATE、CONTRADICT、ANALOGY、CONDITIONAL 和 PARALLEL 等关系投影到 Neo4j。拿到 seed Fact IDs 后，系统可以沿这些边做一到三跳扩展，记录完整 reasoning path，并优先保留更短的路径。
+
+回到改期的例子：如果图中记录了“支付审查”与“发布日期变化”的因果关系，就可以沿这条边把两件事一起取回。关系本身也是提取结果，是否可信仍要对照原文检查。
+
+### 第三路：MySQL 补回时间
+
+时间信息保存在 Chunk 上。时序扩展从 seed Fact IDs 查回对应 Chunk，再按轮次或时间窗口取邻近内容：
+
+```text
+seed Fact IDs
+        ↓ JOIN facts.chunk_id = mem_chunks.chunk_id
+seed Chunk.turn / Chunk.created_at
+        ↓ calculate window + direction
+neighbor Chunks in MySQL
+        ↓ load facts by chunk_id
+temporal context
+```
+
+turn 模式下，如果 seed Fact 来自第 12 轮，`hop_distance=1` 且 `direction=both`，系统会查询第 11 到 13 轮的 Chunk，再取回这些 Chunk 对应的 Facts。forward 只向后扩，backward 只向前扩。
+
+time 模式使用 `mem_chunks.created_at` 计算窗口，本文所述实现把一跳设为五分钟，再按方向扩展。这样查询只需要使用 Chunk 上的时间，不必同时维护 Fact metadata 中的一份副本。
+
+## 三份存储，以哪份为准
+
+Source、Chunk、Fact、Topic，以及轮次、时间和来源关联都持久化在 MySQL。Qdrant 保存向量索引，Neo4j 保存用于查询的图结构；这两份数据都可以从持久化记录重建。
+
+| 存储 | 主要职责 | 丢失后怎样处理 |
+| --- | --- | --- |
+| MySQL | 原始证据、派生记录、时间、顺序与追溯关系 | 需要备份与恢复 |
+| Qdrant | conversation、Fact、Topic 的语义索引 | 可从 MySQL 记录重新生成向量 |
+| Neo4j | Fact、Entity、Relation 的图关系投影 | 可从事实和关系记录重建 |
+
+这也给同步故障留了处理办法：Qdrant 或 Neo4j 的索引出问题，可以从 MySQL 重建。不过“可以重建”不等于查询时总是一致，异步更新的延迟和失败仍然需要监测。
+
+## 最后交给 Agent 的内容
+
+如果 API 直接返回三份列表，调用方仍然需要理解 Qdrant、Neo4j 和 MySQL 的内部结构。GauzMem 在最后一步把三路结果合并、去重，并保留 source、path、time、chunk\_id、hop level 等追溯信息，形成 Recall Bundle。
+
+对 Agent 来说，一条可用记忆至少应该回答四个问题：
+
+-   **内容是什么**：Fact 或原始 Chunk 表达了什么。
+-   **为什么被召回**：来自语义命中、图关系还是时序邻接。
+-   **从哪里来**：对应哪个 Source 和 Chunk。
+-   **处在什么上下文**：它的关系路径、轮次和时间窗口是什么。
+
+调用方拿到这份 Recall Bundle，就可以读取事实、查看来源，必要时回到 Chunk 核对原文，不必分别访问三个数据库。
+
+## 刚说过的话，要先存下来
+
+一段对话进入后，先保存原始 Chunk，供短期记忆使用。Fact、Entity、Relation 和 Topic 的抽取，以及向量和图谱的更新放到后台。后续抽取失败时，原文还在，可以重新处理。
+
+这里分开处理的是两种等待：用户刚说的话需要尽快可读，整理长期记忆可以晚一点完成。具体能做到多快，还取决于数据量、模型和部署条件。
+
+## 代价和还要处理的问题
+
+-   图扩展限制在一到三跳，防止关系数量失控；更多跳数不天然等于更好的上下文。
+-   turn 不是全局时钟，只在会话域内有意义；当一个项目承载多条独立会话时，时序查询必须同时限定 session 边界。
+-   Qdrant 和 Neo4j 可以重建，不代表可以忽略同步失败；投影状态仍然需要健康检查与可观测性。
+-   Recall Bundle 能提供证据，不保证上层模型一定做出正确推理；生成答案仍然需要自己的评测。
+
+三路召回也增加了存储、同步和排障的工作量。如果任务只需要找回相似片段，未必需要完整地引入这套结构。GauzMem 多做的部分，主要用来回答来源、关系和前后顺序。
+
+源码里可以从 `Fact.chunk_id` 对应的查询看起：先找到 seed，再查图关系和邻近 Chunk，最后看结果如何合并。
+
+[View GauzMem on GitHub →](https://github.com/fightheyyy/gauzmem)
+
+---
+
+[查看原版文章及交互图表](/classic/posts/gauzmem-three-path-memory.html)
