@@ -1,33 +1,27 @@
 (() => {
   // Run before rendering so a minimal visit never flashes the editorial homepage.
   const root = new URL("./", document.currentScript.src);
-  const preferenceKey = "fightheyyy.blog-style";
-  const sessionKey = "fightheyyy.visit-style";
   const url = new URL(location.href);
   const requested = url.searchParams.get("view");
   const valid = value => value === "minimal" || value === "editorial";
-  const read = (storage, key) => {
-    try { return window[storage].getItem(key); } catch { return null; }
-  };
-  const save = (storage, key, value) => {
-    try { window[storage].setItem(key, value); } catch { /* Browsing still works without storage. */ }
-  };
-  if (valid(requested)) {
-    save("localStorage", preferenceKey, requested);
-    save("sessionStorage", sessionKey, requested);
-  }
-  if (url.pathname !== root.pathname && url.pathname !== `${root.pathname}index.html`) return;
+  // Remove preferences left by the previous version; future visits save nothing.
+  try { localStorage.removeItem("fightheyyy.blog-style"); } catch {}
+  try { sessionStorage.removeItem("fightheyyy.visit-style"); } catch {}
 
-  let style = requested;
-  if (!valid(style)) style = read("localStorage", preferenceKey);
-  if (!valid(style)) style = read("sessionStorage", sessionKey);
-  if (!valid(style)) {
-    style = Math.random() < .5 ? "minimal" : "editorial";
-    save("sessionStorage", sessionKey, style);
+  const onEditorial = url.pathname === root.pathname || url.pathname === `${root.pathname}index.html`;
+  const onMinimal = url.pathname === `${root.pathname}classic/` || url.pathname === `${root.pathname}classic/index.html`;
+  if (!onEditorial && !onMinimal) return;
+
+  const style = valid(requested) ? requested : Math.random() < .5 ? "minimal" : "editorial";
+  if (valid(requested)) {
+    url.searchParams.delete("view");
+    history.replaceState(history.state, "", url.href);
   }
-  if (style === "minimal") {
-    const destination = new URL("classic/index.html", root);
+  if ((style === "minimal" && onEditorial) || (style === "editorial" && onMinimal)) {
+    const destination = new URL(style === "minimal" ? "classic/index.html" : "./", root);
     destination.search = url.search;
+    // A one-use hint prevents a second random draw on the destination page.
+    destination.searchParams.set("view", style);
     destination.hash = url.hash;
     location.replace(destination.href);
   }

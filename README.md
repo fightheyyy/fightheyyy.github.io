@@ -4,7 +4,7 @@ Personal blog with two presentations: **Editorial** and **Minimal**.
 
 - Editorial: spacious article index, project showcase, Terminal, and animated XIAOBA mascots.
 - Minimal: the original blog, with matching navigation and a switch back to Editorial.
-- The first homepage visit randomly selects either presentation. The choice stays stable for that browser session; a manual switch is remembered for future visits.
+- Every homepage visit or refresh randomly selects either presentation with equal probability. Manual switches apply once; no choice is saved.
 
 ## Develop
 
