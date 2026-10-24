@@ -21,7 +21,7 @@ for (const name of ['index.html', ...(await readdir(path.join(classic, 'posts'))
   await writeFile(file, html
     .replace(/\s*<link[^>]+dev-theme\.css[^>]*>/g, '')
     .replace(/\s*<script[^>]+dev-theme\.js[^>]*><\/script>/g, '')
-    .replace(/<title>([\s\S]*?)<\/title>/, (_match, title) => `<title>${home ? 'Home' : title.replace(/ — Fightheyyy$/, '')} — Fightheyyy</title>`)
+    .replace(/<title>([\s\S]*?)<\/title>/, (_match, title) => `<title>${home ? 'Home' : title.replace(/ — (?:Fightheyyy|fightheyyy\.dev)$/, '')} — fightheyyy.dev</title>`)
     .replace(/<link\b[^>]*\brel="icon"[^>]*>/, `<link rel="icon" type="image/svg+xml" href="${icon}" />`))
 }
 const slugNames = (await readdir(path.join(source, 'posts'))).filter(n => n.endsWith('.html'))

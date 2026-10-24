@@ -1,5 +1,5 @@
 export const site = {
-  name: 'Fightheyyy',
+  name: 'fightheyyy.dev',
   wordmark: 'fightheyyy.dev',
   description:
     'I build Agent Runtime, evaluation, and continuous evolution infrastructure.',
