@@ -16,7 +16,13 @@ for (const name of ['index.html', 'styles.css', 'script.js', 'assets', 'posts'])
 for (const name of ['index.html', ...(await readdir(path.join(classic, 'posts'))).filter(n => n.endsWith('.html')).map(n => `posts/${n}`)]) {
   const file = path.join(classic, name)
   const html = await readFile(file, 'utf8')
-  await writeFile(file, html.replace(/\s*<link[^>]+dev-theme\.css[^>]*>/g, '').replace(/\s*<script[^>]+dev-theme\.js[^>]*><\/script>/g, ''))
+  const home = name === 'index.html'
+  const icon = `${home ? '../' : '../../'}mascot/xiaoba/logo.svg?v=solid-cobalt-white-v4`
+  await writeFile(file, html
+    .replace(/\s*<link[^>]+dev-theme\.css[^>]*>/g, '')
+    .replace(/\s*<script[^>]+dev-theme\.js[^>]*><\/script>/g, '')
+    .replace(/<title>([\s\S]*?)<\/title>/, (_match, title) => `<title>${home ? 'Home' : title.replace(/ — Fightheyyy$/, '')} — Fightheyyy</title>`)
+    .replace(/<link\b[^>]*\brel="icon"[^>]*>/, `<link rel="icon" type="image/svg+xml" href="${icon}" />`))
 }
 const slugNames = (await readdir(path.join(source, 'posts'))).filter(n => n.endsWith('.html'))
 // Keep upstream samples as editable references outside the published collection.
