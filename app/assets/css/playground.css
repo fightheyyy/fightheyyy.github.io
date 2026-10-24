@@ -1,6 +1,8 @@
 @layer components {
+  .shared-footer-document { overflow: hidden; }
+  .shared-footer-page { display: flow-root; }
   .cat-dream { position: relative; width: 100%; height: clamp(330px, 43vw, 560px); margin-top: 48px; overflow: hidden; isolation: isolate; }
-  .dream-landscape { position: absolute; width: min(80%, 1120px); height: 100%; left: 50%; top: 0; transform: translateX(-50%); overflow: visible; }
+  .dream-landscape { position: absolute; z-index: 1; width: min(80%, 1120px); height: 100%; left: 50%; top: 0; transform: translateX(-50%); overflow: visible; pointer-events: none; }
   .dream-horizon, .dream-far-hill { stroke: var(--dream-line); stroke-width: 1; }
   .dream-far-hill { opacity: .45; }
   .dream-dust { stroke: var(--dream-mist); fill: var(--dream-mist); stroke-width: 1; }
@@ -18,7 +20,24 @@
   .dream-flower-stem { stroke: var(--dream-grass); stroke-width: 1.5; }
   .dream-cat-shadow { fill: var(--dream-line); opacity: .35; }
   .dream-meadow-details { stroke: var(--dream-grass); fill: var(--dream-grass); stroke-width: 1; opacity: .55; }
-  .dream-traveler { width: 84px; height: 91px; }
+  .dream-traveler { width: 84px; height: 91px; pointer-events: auto; }
+  .visit-constellation { position: absolute; inset: 0; z-index: 0; pointer-events: none; }
+  .visit-sky { display: block; width: 100%; height: 100%; outline-offset: -8px; }
+  .visit-star { fill: var(--faint); cursor: default; }
+  .visit-dust, .visit-planet { fill: var(--faint); }
+  .visit-star.is-selected { fill: var(--muted); }
+  .visit-star-shine { stroke: var(--faint); stroke-width: .65; opacity: .55; }
+  .visit-star-ring { stroke: var(--muted); stroke-width: .6; fill: none; opacity: .45; }
+  .visit-star-trail { fill: none; stroke: var(--faint); stroke-width: .65; stroke-dasharray: 2 5; opacity: .4; }
+  .visit-hit-area { fill: transparent; pointer-events: all; }
+  .visit-tooltip { position: absolute; z-index: 3; min-width: 166px; padding: 12px 16px; background: var(--bg); border: 1px solid var(--line); color: var(--muted); font: 10px/1.6 var(--font-mono); }
+  .visit-tooltip strong { display: block; margin-top: 4px; color: var(--ink); font: 500 19px/1.4 var(--font-mono); }
+  .visit-tooltip strong span { font-size: 11px; font-weight: 400; color: var(--muted); }
+  .visit-period, .visit-total { position: absolute; bottom: 25px; color: var(--muted); font: 9px/1.8 var(--font-mono); letter-spacing: .06em; }
+  .visit-period { left: var(--gutter); display: flex; gap: 12px; }
+  .visit-demo-label { letter-spacing: 0; }
+  .visit-total { right: var(--gutter); display: grid; justify-items: end; gap: 7px; }
+  .visit-total svg { display: block; max-width: 160px; height: 30px; fill: var(--faint); }
   .dream-traveler .xiaoba-mascot { transform-origin: 50% 82%; transition: transform .55s ease-in-out; }
   .dream-sun, .dream-cloud, .dream-star, .dream-moon, .dream-grass, .dream-sprout, .dream-petal { transform-box: fill-box; transform-origin: center; scale: .48; }
   .dream-grass, .dream-sprout, .dream-petal { transform-origin: bottom center; }
@@ -41,6 +60,9 @@
     .cat-dream { height: 350px; margin-top: 32px; }
   }
   @media (max-width: 480px) {
+    .visit-period { bottom: 18px; left: 20px; flex-direction: column; gap: 0; font-size: 8px; }
+    .visit-total { bottom: 18px; right: 20px; font-size: 8px; }
+    .visit-total svg { max-width: 128px; height: 24px; }
     .cat-dream { height: 310px; }
     .dream-landscape { width: 560px; }
     .dream-sun-anchor { transform: translate(46px, -143px); }

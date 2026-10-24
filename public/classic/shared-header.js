@@ -1,5 +1,14 @@
 (() => {
   const siteRoot = new URL("../", document.currentScript.src);
+  const footer = document.querySelector(".classic-footer-frame");
+  if (footer) {
+    window.addEventListener("message", event => {
+      if (event.origin !== location.origin || event.source !== footer.contentWindow || event.data?.type !== "blog-footer:height") return;
+      const height = Number(event.data.height);
+      if (Number.isFinite(height) && height >= 200 && height <= 5000) footer.height = String(Math.ceil(height));
+    });
+    footer.addEventListener("load", () => footer.contentWindow?.postMessage({ type: "blog-footer:measure" }, location.origin));
+  }
   const header = document.querySelector(".classic-site-header");
   if (!header) return;
 

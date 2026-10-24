@@ -29,15 +29,11 @@ onBeforeUnmount(() => observer?.disconnect())
 </script>
 
 <template>
-  <section ref="root" class="cat-dream" :class="{ 'is-awake': awake }" aria-label="小八的梦游花园" @pointermove="look" @pointerleave="rest">
+  <section id="garden" ref="root" class="cat-dream" :class="{ 'is-awake': awake }" aria-label="小八的梦游花园" @pointermove="look" @pointerleave="rest">
+    <VisitConstellation />
     <svg ref="landscape" class="dream-landscape" viewBox="0 0 1200 500" fill="none" aria-hidden="true">
       <path ref="horizon" class="dream-horizon" d="M-30 427C156 358 282 395 432 405S702 451 886 392s249-34 346-8" />
       <path class="dream-far-hill" d="M-20 439c151-36 259-10 354 14m416-18c175 0 247-60 476-21" />
-      <g class="dream-dust">
-        <circle cx="281" cy="154" r="1.5"/><circle cx="422" cy="90" r="2"/><circle cx="746" cy="97" r="1.5"/><circle cx="943" cy="216" r="2"/>
-        <circle cx="352" cy="313" r="1.5"/><circle cx="1051" cy="333" r="1.5"/><circle cx="652" cy="400" r="2"/>
-        <path d="M364 189v8m-4-4h8m448 147v8m-4-4h8M1009 106v7m-3.5-3.5h7"/>
-      </g>
       <g class="dream-sun-anchor" transform="translate(-214 -143)"><g class="dream-sun">
         <g class="dream-rays"><path d="M214 74V62m0 132v-12m-54-54h-12m132 0h-12m-92-38-8-8m92 92-8-8m-76 0-8 8m92-92-8 8"/></g>
         <path class="dream-sun-body" d="M174 115v-29q0-6 6-2l21 14a40 40 0 0 1 26 0l21-14q6-4 6 2v29a42 42 0 1 1-80 0Z"/>

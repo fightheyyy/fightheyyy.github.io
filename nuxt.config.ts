@@ -8,7 +8,7 @@ export default defineNuxtConfig({
   modules: ['@nuxt/content'],
   css: ['@fontsource-variable/nunito-sans', 'cn-fontsource-975-maru-sc-regular/font.css', '~/assets/css/maru-bold.css', '@fontsource-variable/geist-mono', '~/assets/css/main.css', '~/assets/css/projects.css', '~/assets/css/terminal.css', '~/assets/css/connect.css', '~/assets/css/typography.css', '~/assets/css/mascot.css', '~/assets/css/playground.css'],
   devtools: { enabled: false },
-  nitro: { prerender: { routes: ['/search.json', '/rss.xml', '/sitemap.xml', '/robots.txt'] } },
+  nitro: { prerender: { routes: ['/search.json', '/rss.xml', '/sitemap.xml', '/robots.txt', '/shared-footer'] } },
   typescript: { strict: true },
   vite: { plugins: [tailwindcss()] },
   runtimeConfig: { public: { siteUrl: 'https://fightheyyy.github.io' } },

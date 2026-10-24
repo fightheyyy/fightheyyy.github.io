@@ -1,10 +1,14 @@
 # Fightheyyy Dev theme
 
-Based on [alexanderop/nuxt-editorial-starter](https://github.com/alexanderop/nuxt-editorial-starter), MIT. The upstream license is retained in `LICENSE`; the Git remote is named `upstream`.
+Based on [alexanderop/nuxt-editorial-starter](https://github.com/alexanderop/nuxt-editorial-starter), MIT. The upstream license is retained in `LICENSE`.
 
 The seven articles are in `content/blog/`. Site identity and categories are in `shared/site.ts`; project data is shared through `shared/projects.ts`, ordered by creation date. The original HTML blog and its assets are retained at `public/classic/` and exposed under `/classic/`, with a shared navigation header.
 
 The header labels the two presentations **Editorial** and **Minimal**. `public/entry.js` chooses either presentation equally on every homepage load, including refreshes of the Minimal homepage. Explicit switches (`?view=editorial` and `/classic/index.html?view=minimal`) apply only to that navigation; the hint is immediately removed from the address bar. Redirects carry the same one-use hint to avoid drawing twice. No choice is saved, and preferences from the previous version are removed. Direct article and Terminal URLs bypass the random choice. Without JavaScript, the homepage remains a complete editorial page.
+
+Both headers include Terminal. Both presentations share `SiteFooter.vue`, including Explore, Contact, RSS, and the animated garden. Static Minimal pages embed the prerendered `/shared-footer/` document; its height is reported to the parent, and links navigate the full page. The footer uses Minimal destinations for Home, Blog, and Projects in that presentation. The shared-footer route is excluded from indexing and is explicitly included in static generation.
+
+`VisitConstellation.vue` draws a quiet starfield with 28 daily markers and a dot-matrix cumulative counter. The current snapshot in `shared/traffic.ts` is **demonstration data**, labeled in the interface. No analytics collection or analytics provider is connected. A future integration can pass a `TrafficSnapshot` through the component's `data` prop.
 
 The XIAOBA mascot uses its original Canvas renderer and expression geometry, pinned to the upstream revision in `public/mascot/xiaoba/SOURCE.md`. It is a procedural animated cat, not a Cubism Live2D model. Runtime scripts, logo, manifest and required Apache/BSD notices are self-hosted in that directory. `XiaobaMascot.vue` loads the assets once, pauses animation off-screen and in background tabs, and honors reduced-motion preferences. No XIAOBA agent backend is contacted.
 
