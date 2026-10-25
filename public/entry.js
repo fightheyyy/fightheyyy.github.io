@@ -23,6 +23,7 @@
     // A one-use hint prevents a second random draw on the destination page.
     destination.searchParams.set("view", style);
     destination.hash = url.hash;
+    window.__blogEntryRedirect = true;
     location.replace(destination.href);
   }
 })();

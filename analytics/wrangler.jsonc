@@ -1,0 +1,16 @@
+{
+  "$schema": "https://unpkg.com/wrangler/config-schema.json",
+  "name": "fightheyyy-blog-traffic",
+  "main": "worker.js",
+  "compatibility_date": "2026-10-25",
+  "workers_dev": true,
+  "vars": { "SITE_ORIGIN": "https://fightheyyy.github.io" },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "fightheyyy-blog-traffic",
+      "database_id": "REPLACE_AFTER_DATABASE_CREATION",
+      "migrations_dir": "migrations"
+    }
+  ]
+}

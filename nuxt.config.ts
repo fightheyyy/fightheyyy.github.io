@@ -37,7 +37,10 @@ export default defineNuxtConfig({
   app: {
     head: {
       htmlAttrs: { lang: 'zh-CN', class: 'light' },
-      script: [{ src: `${baseURL}entry.js?v=dual-view-v2`, tagPriority: 'critical' }],
+      script: [
+        { src: `${baseURL}entry.js?v=dual-view-v3`, tagPriority: 'critical' },
+        { src: `${baseURL}traffic.js?v=live-v1`, defer: true },
+      ],
       link: [
         { rel: 'stylesheet', href: `${baseURL}fonts/noto-sans-sc/index.css` },
         { rel: 'icon', type: 'image/svg+xml', href: `${baseURL}mascot/xiaoba/logo.svg?v=solid-cobalt-white-v4` },

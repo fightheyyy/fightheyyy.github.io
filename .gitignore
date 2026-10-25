@@ -20,3 +20,4 @@ scripts/build-reference-gallery.py
 
 /dist
 .playwright-cli/
+.wrangler/

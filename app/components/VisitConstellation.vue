@@ -1,8 +1,22 @@
 <script setup lang="ts">
-import { demoTraffic, type TrafficSnapshot } from '~~/shared/traffic'
+import type { BlogTrafficClient, TrafficSnapshot } from '~~/shared/traffic'
 
 const props = defineProps<{ data?: TrafficSnapshot }>()
-const snapshot = computed(() => props.data ?? demoTraffic)
+const liveData = shallowRef<TrafficSnapshot | null>(null)
+const status = ref<BlogTrafficClient['status']>('loading')
+const snapshot = computed(() => props.data ?? liveData.value)
+const days = computed(() => snapshot.value?.days ?? [])
+const statusLabel = computed(() => {
+  if (status.value === 'unavailable') return '访问数据暂不可用'
+  if (snapshot.value) return 'PAGE VIEWS · LIVE'
+  if (status.value === 'loading') return '正在读取访问数据'
+  return '暂无访问数据'
+})
+function syncTraffic() {
+  if (!window.blogTraffic) return
+  liveData.value = window.blogTraffic.data
+  status.value = window.blogTraffic.status
+}
 const root = useTemplateRef<HTMLElement>('root')
 const size = reactive({ width: 1440, height: 540 })
 const selected = ref<number | null>(null)
@@ -21,10 +35,10 @@ function noise(seed: number) {
   return value - Math.floor(value)
 }
 const stars = computed(() => {
-  const peak = Math.max(1, ...snapshot.value.days.map(day => day.visits))
+  const peak = Math.max(1, ...days.value.map(day => day.visits))
   const scale = Math.max(.55, Math.min(1, size.width / 1100))
-  return snapshot.value.days.slice(-28).map((day, index) => {
-    const anchor = anchors[index]!
+  return days.value.slice(-28).map((day, index) => {
+    const anchor = anchors[28 - days.value.length + index]!
     const x = Math.max(25, Math.min(size.width - 25, anchor[0] / 1440 * size.width))
     const y = anchor[1] / 540 * size.height
     const strength = Math.sqrt(Math.max(0, day.visits) / peak)
@@ -77,6 +91,7 @@ function dateLabel(date: string) {
 function move(event: KeyboardEvent) {
   if (event.key === 'Escape') { selected.value = null; return }
   if (!['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) return
+  if (!stars.value.length) return
   event.preventDefault()
   const last = stars.value.length - 1
   if (event.key === 'Home') selected.value = 0
@@ -96,8 +111,9 @@ const glyphs: Record<string, string[]> = {
   '8': ['01110', '10001', '10001', '01110', '10001', '10001', '01110'],
   '9': ['01110', '10001', '10001', '01111', '00001', '00001', '01110'],
   ',': ['0', '0', '0', '0', '0', '1', '1'],
+  '—': ['00000', '00000', '00000', '11111', '00000', '00000', '00000'],
 }
-const totalLabel = computed(() => Math.max(0, Math.floor(snapshot.value.total)).toLocaleString('en-US'))
+const totalLabel = computed(() => snapshot.value ? snapshot.value.total.toLocaleString('en-US') : '—')
 const totalDots = computed(() => {
   let offset = 0
   const points: { x: number; y: number }[] = []
@@ -111,21 +127,28 @@ const totalDots = computed(() => {
   return { points, width: offset * 4 - 6 }
 })
 onMounted(() => {
+  window.addEventListener('blog:traffic-updated', syncTraffic)
+  window.addEventListener('blog:traffic-ready', syncTraffic)
+  syncTraffic()
   if (!root.value) return
   observer = new ResizeObserver(([entry]) => {
     if (entry) { size.width = entry.contentRect.width; size.height = entry.contentRect.height }
   })
   observer.observe(root.value)
 })
-onBeforeUnmount(() => observer?.disconnect())
+onBeforeUnmount(() => {
+  observer?.disconnect()
+  window.removeEventListener('blog:traffic-updated', syncTraffic)
+  window.removeEventListener('blog:traffic-ready', syncTraffic)
+})
 </script>
 
 <template>
   <div ref="root" class="visit-constellation" @pointerleave="selected = null">
     <svg
       class="visit-sky" :viewBox="`0 0 ${size.width} ${size.height}`" preserveAspectRatio="none"
-      role="group" :aria-label="`最近四周每日访问量${snapshot.source === 'demo' ? '，演示数据' : ''}，左右方向键浏览日期`"
-      tabindex="0" @keydown="move" @focus="selected = 0" @blur="selected = null"
+      role="group" :aria-label="stars.length ? '最近四周每日访问次数，左右方向键浏览日期' : statusLabel"
+      :tabindex="stars.length ? 0 : undefined" @keydown="move" @focus="selected = stars.length ? 0 : null" @blur="selected = null"
     >
       <g class="visit-dust" aria-hidden="true"><circle v-for="(point, index) in dust" :key="index" :cx="point.x" :cy="point.y" :r="point.r" :opacity="point.opacity" /></g>
       <g class="visit-planet" aria-hidden="true"><circle v-for="(point, index) in planet" :key="index" :cx="point.x" :cy="point.y" :r="point.r" :opacity="point.opacity" /></g>
@@ -140,15 +163,15 @@ onBeforeUnmount(() => observer?.disconnect())
       </g>
     </svg>
     <div v-if="active" class="visit-tooltip" :style="tooltipStyle" role="status">
-      <span>{{ dateLabel(active.date) }}<span v-if="snapshot.source === 'demo'"> · DEMO</span></span>
-      <strong>{{ active.visits.toLocaleString('en-US') }} <span>visits</span></strong>
+      <span>{{ dateLabel(active.date) }} · UTC+8</span>
+      <strong>{{ active.visits.toLocaleString('en-US') }} <span>views</span></strong>
     </div>
-    <div class="visit-period"><span>LAST 4 WEEKS</span><span v-if="snapshot.source === 'demo'" class="visit-demo-label">演示数据</span></div>
-    <div class="visit-total" :aria-label="`累计访问量 ${totalLabel}${snapshot.source === 'demo' ? '，演示数据' : ''}`">
+    <div class="visit-period"><span>LAST 4 WEEKS</span><span>{{ statusLabel }}</span></div>
+    <div class="visit-total" :aria-label="snapshot ? `接入统计以来累计页面访问 ${totalLabel} 次` : statusLabel">
       <svg :viewBox="`0 0 ${totalDots.width} 30`" :style="{ width: `${totalDots.width}px` }" aria-hidden="true">
         <circle v-for="(point, index) in totalDots.points" :key="index" :cx="point.x" :cy="point.y" r="1.15" />
       </svg>
-      <span>TOTAL VISITS<span v-if="snapshot.source === 'demo'"> · DEMO</span></span>
+      <span>TOTAL PAGE VIEWS</span>
     </div>
   </div>
 </template>

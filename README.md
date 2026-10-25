@@ -23,6 +23,8 @@ Articles: `content/blog/`. Project data: `shared/projects.ts`. Site identity: `s
 
 See [migration notes](docs/MIGRATION.md) for the original-blog import workflow. Legacy article URLs remain available and redirect to the current articles.
 
+Pageview collection and its Cloudflare deployment are described in [analytics setup](docs/analytics.md). Both presentations share one counter; no demo counts are shown.
+
 ## Publish
 
 Pushes to `main` run the GitHub Pages workflow, which installs dependencies, generates `.output/public/`, and publishes that directory. GitHub Pages must use **GitHub Actions** as its source.
