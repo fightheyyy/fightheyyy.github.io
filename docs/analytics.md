@@ -15,6 +15,11 @@ interactive stars represent the daily values. The dot-matrix number is cumulativ
 PV since this counter was installed. Requests or database errors show an unavailable
 state, never fabricated counts. Preview fixtures have been removed.
 
+Production endpoint: `https://fightheyyy-blog-traffic.fightheyyy.workers.dev`.
+No paid Workers subscription is created by this deployment. Stay on Workers Free;
+daily quota exhaustion should make statistics unavailable, rather than upgrading
+the account. The blog remains readable if the statistics backend is unavailable.
+
 ## Initial deployment (requires the owner's Cloudflare login)
 
 Run from `analytics/`:

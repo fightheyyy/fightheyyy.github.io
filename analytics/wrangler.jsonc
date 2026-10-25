@@ -1,6 +1,7 @@
 {
   "$schema": "https://unpkg.com/wrangler/config-schema.json",
   "name": "fightheyyy-blog-traffic",
+  "account_id": "6afaca4768c145daa4951453847e5c41",
   "main": "worker.js",
   "compatibility_date": "2026-10-25",
   "workers_dev": true,
@@ -9,7 +10,7 @@
     {
       "binding": "DB",
       "database_name": "fightheyyy-blog-traffic",
-      "database_id": "REPLACE_AFTER_DATABASE_CREATION",
+      "database_id": "bae9dc87-9119-4cd6-8344-8f90372e6ee3",
       "migrations_dir": "migrations"
     }
   ]

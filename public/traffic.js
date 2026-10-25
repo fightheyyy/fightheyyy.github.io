@@ -45,7 +45,7 @@
     if (window.top !== window.self || window.__blogEntryRedirect || document.prerendering) return;
     if (document.visibilityState !== 'visible') return;
     const path = location.pathname.replace(/\/$/, '') || '/';
-    if (path.endsWith('/shared-footer') || lastPath === path) return;
+    if (/\/shared-footer(?:\/index\.html)?$/.test(path) || lastPath === path) return;
     lastPath = path;
     await ready;
     if (!config || location.origin !== config.siteOrigin) { refresh(); return; }
