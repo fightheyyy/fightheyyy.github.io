@@ -20,7 +20,10 @@
   .dream-flower-stem { stroke: var(--dream-grass); stroke-width: 1.5; }
   .dream-cat-shadow { fill: var(--dream-line); opacity: .35; }
   .dream-meadow-details { stroke: var(--dream-grass); fill: var(--dream-grass); stroke-width: 1; opacity: .55; }
-  .dream-traveler { width: 84px; height: 91px; pointer-events: auto; }
+  /* Same centered 1200 × 500 coordinate space as the width-constrained SVG. */
+  .dream-traveler-stage { position: absolute; z-index: 2; width: min(80%, 1120px); aspect-ratio: 12 / 5; left: 50%; top: 50%; transform: translate(-50%, -50%); pointer-events: none; }
+  .dream-traveler-anchor { position: absolute; width: 7%; height: 18.2%; transform-origin: 0 0; }
+  .dream-traveler { position: relative; left: -46.428571%; top: -84.615385%; width: 100%; height: 100%; transform-origin: 46.428571% 84.615385%; pointer-events: auto; }
   .visit-constellation { position: absolute; inset: 0; z-index: 0; pointer-events: none; }
   .visit-sky { display: block; width: 100%; height: 100%; outline-offset: -8px; }
   .visit-star { fill: var(--faint); cursor: default; }
@@ -64,7 +67,7 @@
     .visit-total { bottom: 18px; right: 20px; font-size: 8px; }
     .visit-total svg { max-width: 128px; height: 24px; }
     .cat-dream { height: 310px; }
-    .dream-landscape { width: 560px; }
+    .dream-landscape, .dream-traveler-stage { width: 560px; }
     .dream-sun-anchor { transform: translate(46px, -143px); }
     .dream-cloud-anchor { transform: translate(-470px, -130px); }
     .dream-moon-anchor { transform: translate(-50px, -300px); }

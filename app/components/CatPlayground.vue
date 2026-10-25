@@ -65,10 +65,15 @@ onBeforeUnmount(() => observer?.disconnect())
       <g class="dream-meadow-details"><path d="m173 406 2-9 3 9m565 17 3-12 3 12m269-27 2-8 3 8"/><circle cx="443" cy="431" r="2"/><circle cx="817" cy="443" r="1.5"/></g>
       <g :transform="stroll.transform.value">
         <ellipse class="dream-cat-shadow" cx="0" cy="0" rx="30" ry="2" />
-        <foreignObject x="-39" y="-77" width="84" height="91">
-          <div xmlns="http://www.w3.org/1999/xhtml" class="dream-traveler" :style="{ translate: `0 ${stroll.body.bob}px`, scale: `1 ${stroll.body.squash}` }"><XiaobaMascot :size="84" variant="agents" :animated="awake" :pose="stroll.pose.value" :flip="stroll.flip.value" :gaze-enabled="stroll.looking.value" :attention="stroll.attention.value" /></div>
-        </foreignObject>
       </g>
     </svg>
+    <!-- Match the SVG viewBox in HTML: Safari can mispaint Canvas inside foreignObject. -->
+    <div class="dream-traveler-stage" aria-hidden="true">
+      <div class="dream-traveler-anchor" :style="{ left: `${stroll.body.x / 12}%`, top: `${stroll.body.y / 5}%`, transform: `rotate(${stroll.body.angle}deg)` }">
+        <div class="dream-traveler" :style="{ transform: `translateY(${stroll.body.bob / 91 * 100}%) scaleY(${stroll.body.squash})` }">
+          <XiaobaMascot fluid :size="84" variant="agents" :animated="awake" :pose="stroll.pose.value" :flip="stroll.flip.value" :gaze-enabled="stroll.looking.value" :attention="stroll.attention.value" />
+        </div>
+      </div>
+    </div>
   </section>
 </template>

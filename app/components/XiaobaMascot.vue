@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { loadXiaobaMascot, type XiaobaPlayer } from '~/utils/xiaoba-mascot'
 import { xiaobaLooks, type XiaobaLook } from '~/utils/xiaoba-looks'
-const props = withDefaults(defineProps<{ size?: number; animated?: boolean; variant?: XiaobaLook; pose?: string; reaction?: number; flip?: boolean; gazeEnabled?: boolean; attention?: { x: number; y: number } }>(), { size: 64, animated: true, gazeEnabled: true })
+const props = withDefaults(defineProps<{ size?: number; fluid?: boolean; animated?: boolean; variant?: XiaobaLook; pose?: string; reaction?: number; flip?: boolean; gazeEnabled?: boolean; attention?: { x: number; y: number } }>(), { size: 64, animated: true, gazeEnabled: true })
 const base = useRuntimeConfig().app.baseURL
 const root = useTemplateRef<HTMLElement>('root')
 const canvas = useTemplateRef<HTMLCanvasElement>('canvas')
@@ -16,10 +16,18 @@ const restingState = computed(() => props.pose || (props.variant ? xiaobaLooks[p
 
 function syncPlayback() {
   if (!player) return
-  player.destroy()
-  player.reducedMotion = motion?.matches ?? false
-  if (inView && !document.hidden && !player.reducedMotion && props.animated) player.start()
-  else player.draw()
+  try {
+    player.destroy()
+    player.reducedMotion = motion?.matches ?? false
+    // Keep a painted frame even while offscreen or with reduced motion enabled.
+    player.draw()
+    if (inView && !document.hidden && !player.reducedMotion && props.animated) player.start()
+    ready.value = true
+  } catch {
+    player.destroy()
+    player = undefined
+    ready.value = false
+  }
 }
 function greet() {
   if (!player || motion?.matches || !props.animated || !props.gazeEnabled) return
@@ -58,10 +66,12 @@ onMounted(async () => {
     } : manifest
     player.load(source, { autoplay: false })
     player.setState(restingState.value)
-    ready.value = true
     syncPlayback()
   } catch {
     // The matching static cat remains visible if Canvas cannot initialize.
+    player?.destroy()
+    player = undefined
+    ready.value = false
   }
 })
 watch(() => props.animated, syncPlayback)
@@ -85,7 +95,7 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <span ref="root" class="xiaoba-mascot" :style="{ width: `${size}px`, height: `${size * 208 / 192}px`, transform: flip ? 'scaleX(-1)' : undefined }" aria-hidden="true" @pointerenter="greet">
+  <span ref="root" class="xiaoba-mascot" :style="{ width: fluid ? '100%' : `${size}px`, height: fluid ? '100%' : `${size * 208 / 192}px`, transform: flip ? 'scaleX(-1)' : undefined }" aria-hidden="true" @pointerenter="greet">
     <img v-show="!ready" :src="`${base}mascot/xiaoba/${variant || 'logo'}.svg?v=solid-cobalt-white-v4`" alt="" width="192" height="208" decoding="async" />
     <canvas v-show="ready" ref="canvas" width="384" height="416" />
   </span>
