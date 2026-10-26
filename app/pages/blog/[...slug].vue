@@ -89,7 +89,7 @@ useHead({
     </div>
     <section class="related-section page-shell" aria-labelledby="related-heading">
       <h2 id="related-heading" class="section-title">Keep exploring</h2>
-      <PostFeed :posts="related" :searchable="false" :initial-count="5" />
+      <PostFeed :posts="related" :searchable="false" :highlight-first="false" :initial-count="5" />
     </section>
   </main>
 </template>

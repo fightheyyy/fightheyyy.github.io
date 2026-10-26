@@ -3,15 +3,15 @@ import IconButton from '~/components/ui/IconButton.vue'
 import { Search, X } from '@lucide/vue'
 import { filterPosts, formatDate, orderPosts, type PostSummary } from '~~/shared/editorial'
 const props = withDefaults(
-  defineProps<{ posts: PostSummary[]; initialCount?: number; searchable?: boolean }>(),
-  { initialCount: 10, searchable: true },
+  defineProps<{ posts: PostSummary[]; initialCount?: number; searchable?: boolean; highlightFirst?: boolean }>(),
+  { initialCount: 10, searchable: true, highlightFirst: true },
 )
 const category = ref('All')
 const search = ref('')
 const searchOpen = ref(false)
 const input = useTemplateRef('searchInput')
 const count = ref(props.initialCount)
-const showFeatured = computed(() => category.value === 'All' && !search.value.trim())
+const showFeatured = computed(() => props.highlightFirst && !search.value.trim())
 const filtered = computed(() => filterPosts(orderPosts(props.posts), category.value, search.value))
 const visible = computed(() => filtered.value.slice(0, count.value))
 watch([category, search], () => {
@@ -78,20 +78,20 @@ onBeforeUnmount(() => {
         :key="post.path"
         :to="post.path"
         class="post-row"
-        :class="{ featured: post.featured && showFeatured }"
+        :class="{ featured: index === 0 && showFeatured }"
         :style="{ '--order': index }"
       >
         <div class="post-leading">
           <span class="article-cat">
-            <ArticleEmblem v-if="post.featured && showFeatured" :path="post.path" :category="post.category" />
+            <ArticleEmblem v-if="index === 0 && showFeatured" :path="post.path" :category="post.category" />
             <ArticleMark :path="post.path" :category="post.category" />
           </span>
           <time class="post-date" :datetime="post.date">{{ formatDate(post.date) }}</time>
         </div>
         <div class="post-title">
-          <span v-if="post.featured && showFeatured" class="badge">Editor's note</span>
+          <span v-if="index === 0 && showFeatured" class="badge">{{ post.featured ? "Editor's note" : post.category }}</span>
           <h2>{{ post.title }}</h2>
-          <div v-if="post.featured && showFeatured" class="post-byline">
+          <div v-if="index === 0 && showFeatured" class="post-byline">
             {{ post.author }} <span>{{ post.category }}</span>
           </div>
         </div>
