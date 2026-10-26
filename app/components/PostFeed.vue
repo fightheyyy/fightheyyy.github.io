@@ -12,7 +12,8 @@ const searchOpen = ref(false)
 const input = useTemplateRef('searchInput')
 const count = ref(props.initialCount)
 const showFeatured = computed(() => props.highlightFirst && !search.value.trim())
-const filtered = computed(() => filterPosts(orderPosts(props.posts), category.value, search.value))
+const ordered = computed(() => orderPosts(props.posts))
+const filtered = computed(() => filterPosts(ordered.value, category.value, search.value))
 const visible = computed(() => filtered.value.slice(0, count.value))
 watch([category, search], () => {
   count.value = props.initialCount
@@ -79,7 +80,6 @@ onBeforeUnmount(() => {
         :to="post.path"
         class="post-row"
         :class="{ featured: index === 0 && showFeatured }"
-        :style="{ '--order': index }"
       >
         <div class="post-leading">
           <span class="article-cat">
