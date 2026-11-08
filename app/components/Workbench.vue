@@ -2,6 +2,7 @@
 const selected = ref(0)
 import { projects } from '~~/shared/projects'
 const current = computed(() => projects[selected.value] ?? projects[0]!)
+const catenaArchitecture = `${useRuntimeConfig().app.baseURL}assets/projects/catena-architecture.png`
 async function onTabKey(event: KeyboardEvent) {
   const direction = ['ArrowDown', 'ArrowRight'].includes(event.key) ? 1 : ['ArrowUp', 'ArrowLeft'].includes(event.key) ? -1 : 0
   if (!direction && !['Home', 'End'].includes(event.key)) return
@@ -33,6 +34,9 @@ async function onTabKey(event: KeyboardEvent) {
         <h3 class="project-heading">{{ current.title }}</h3>
         <span class="project-positioning">{{ current.category }}</span>
         <div v-if="current.title === 'XIAOBA'" class="project-cat"><XiaobaMascot :size="220" /></div>
+        <a v-else-if="current.title === 'Catena'" :href="catenaArchitecture" class="block my-3" target="_blank" rel="noreferrer" aria-label="查看 Catena 架构图原图（新窗口）">
+          <img :src="catenaArchitecture" alt="Catena 架构：Langfuse 采集 Trace，ClickHouse 与 PostgreSQL 存储数据；控制面编排 Codex Worker 和 RSI Workflow，完成分析、候选优化、Harbor 回归评测与审核采纳。" width="1752" height="897" class="w-full h-auto" loading="lazy" decoding="async" />
+        </a>
         <div v-else class="diagram">
           <div v-for="(node, index) in current.nodes" :key="`${selected}-${node}`" class="diagram-node">
             <span class="diagram-marker">{{ String(index + 1).padStart(2, '0') }}</span><span>{{ node }}</span>
