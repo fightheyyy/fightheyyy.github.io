@@ -31,14 +31,14 @@ describe('finding notes', () => {
   })
   it('restores every item for an empty query', () =>
     expect(filterPosts(posts, 'All', '  ')).toEqual(posts))
-  it('keeps featured notes first, then newest first with stable ties', () => {
+  it('keeps newest notes first regardless of featured status, with stable ties', () => {
     const input = [
       make('/z'),
       make('/a'),
       make('/new', { date: '2026-10-01' }),
       make('/featured', { featured: true, date: '2020-01-01' }),
     ]
-    expect(orderPosts(input).map((p) => p.path)).toEqual(['/featured', '/new', '/a', '/z'])
+    expect(orderPosts(input).map((p) => p.path)).toEqual(['/new', '/a', '/z', '/featured'])
     expect(input[0]?.path).toBe('/z')
   })
 })

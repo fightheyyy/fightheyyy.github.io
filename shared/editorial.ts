@@ -34,7 +34,6 @@ export function filterPosts<T extends PostSummary>(
 export function orderPosts<T extends PostSummary>(posts: readonly T[]): T[] {
   return [...posts].sort(
     (a, b) =>
-      Number(b.featured) - Number(a.featured) ||
       b.date.localeCompare(a.date) ||
       a.path.localeCompare(b.path),
   )

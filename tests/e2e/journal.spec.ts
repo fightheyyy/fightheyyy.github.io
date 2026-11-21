@@ -6,6 +6,7 @@ test('real articles support category, search, empty state and clear', async ({ p
   await page.goto('/?view=editorial')
   const feed = page.locator('.home-feed')
   await expect(feed.locator('.post-row')).toHaveCount(8)
+  await expect(feed.locator('.post-row').first()).toContainText('OpenFlywheel：如何构建一个企业级 Agent 数据飞轮？')
   await feed.getByRole('button', {name:'Agents', exact:true}).click()
   await expect(feed.locator('.post-row')).toHaveCount(5)
   await feed.getByRole('button', {name:'Search posts'}).click()
