@@ -3,11 +3,11 @@ const article = '/blog/voice-agent-embodied-harness'
 const title = '把 Voice Agent 接进机器人：一套 Harness 的真机演进记录'
 
 test('real articles support category, search, empty state and clear', async ({ page }) => {
-  await page.goto('/')
+  await page.goto('/?view=editorial')
   const feed = page.locator('.home-feed')
-  await expect(feed.locator('.post-row')).toHaveCount(7)
+  await expect(feed.locator('.post-row')).toHaveCount(8)
   await feed.getByRole('button', {name:'Agents', exact:true}).click()
-  await expect(feed.locator('.post-row')).toHaveCount(4)
+  await expect(feed.locator('.post-row')).toHaveCount(5)
   await feed.getByRole('button', {name:'Search posts'}).click()
   await feed.getByRole('searchbox').fill('Catena')
   await expect(feed.locator('.post-row')).toHaveCount(1)
@@ -15,7 +15,7 @@ test('real articles support category, search, empty state and clear', async ({ p
   await expect(feed.getByRole('status')).toContainText('No notes here yet')
   await feed.getByRole('button', {name:'Clear and close search'}).click()
   await feed.getByRole('button', {name:'All', exact:true}).click()
-  await expect(feed.locator('.post-row')).toHaveCount(7)
+  await expect(feed.locator('.post-row')).toHaveCount(8)
 })
 test('Finder keyboard search, selection, Escape and focus restoration', async ({page}) => {
   await page.goto('/')
@@ -72,10 +72,11 @@ test('theme persistence and reduced motion', async ({page}) => {
   await expect(page.locator('html')).toHaveClass(/dark/)
   expect(await page.evaluate(() => document.getAnimations().filter(a => a.playState === 'running').length)).toBe(0)
 })
-test('feeds contain seven real posts and omit samples and drafts', async ({request}) => {
+test('feeds contain eight real posts and omit samples and drafts', async ({request}) => {
   const rss = await request.get('/rss.xml')
   expect(rss.ok()).toBe(true)
   expect(await rss.text()).toContain(title)
+  expect(await rss.text()).toContain('OpenFlywheel：如何构建一个企业级 Agent 数据飞轮？')
   expect(await rss.text()).not.toContain('Building for the long way round')
   const search = await request.get('/search.json')
   expect(await search.text()).not.toContain('Unpublished workshop')
