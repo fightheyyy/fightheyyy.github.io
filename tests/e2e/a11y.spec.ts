@@ -10,6 +10,8 @@ for (const theme of ['light', 'dark'] as const) {
         test(scenario.name, async ({ page }, testInfo) => {
           await page.goto(scenario.route)
           await waitForHydration(page)
+          if (scenario.name.startsWith('resume-'))
+            await page.evaluate((dark) => document.documentElement.classList.toggle('dark', dark), theme === 'dark')
           if (scenario.name === 'finder') {
             await page.keyboard.press('/')
             await expect(page.getByRole('combobox')).toBeFocused()

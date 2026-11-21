@@ -8,7 +8,8 @@ import {
 } from 'reka-ui'
 import { site } from '~~/shared/site'
 const model = defineModel<string>({ default: 'All' })
-const categories = ['All', ...site.categories]
+const props = defineProps<{ resume?: boolean }>()
+const categories = computed(() => ['All', ...site.categories, ...(props.resume ? ['resume'] : [])])
 </script>
 <template>
   <div class="categories" role="group" aria-label="Filter by category">

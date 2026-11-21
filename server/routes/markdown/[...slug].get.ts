@@ -2,7 +2,7 @@ import { queryCollection } from '@nuxt/content/server'
 export default defineEventHandler(async (event) => {
   const slug = getRouterParam(event, 'slug') ?? ''
   if (!slug.endsWith('.md')) throw createError({ statusCode: 404 })
-  const post = await queryCollection(event, 'posts')
+  const post = await queryCollection(event, slug.startsWith('resume/') ? 'resume' : 'posts')
     .path(`/${slug.slice(0, -3)}`)
     .where('draft', '=', false)
     .select('raw')

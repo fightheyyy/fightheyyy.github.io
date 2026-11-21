@@ -1,0 +1,18 @@
+{
+  "tool": "built-in image_gen",
+  "style": "Excalidraw-style interview study diagrams",
+  "images": [
+    {
+      "path": "public/assets/resume/voice-turns.png",
+      "prompt": "Create a wide 1536x1024 Excalidraw-style architecture diagram for an interview study notebook. White background, rough black hand-drawn outlines, muted blue and teal accents, extremely legible English labels, large text, ample whitespace, no decorative artwork. Title: 'Voice Agent: interrupt safely'. Top row connected left to right: 'Microphone' -> 'VAD + ASR' -> 'LLM + Tools' -> 'TTS' -> 'Speaker'. Bottom row: 'New speech' -> 'Cancel old turn' -> 'Clear playback queue'. A new blue arrow from New speech to VAD + ASR. Draw a red dashed line from Cancel old turn to LLM + Tools and TTS. Include a single small box 'turn_id / generation' below with arrows up to TTS and Speaker. A separate inset lower right: 'Long browser job' -> 'Result event' -> 'Current session'; label this inset 'background task'. Exact key idea annotation: 'Drop stale audio and stale callbacks'. Diagram describes conceptual design questions, not a verified production deployment. All labels readable. No logos, no watermarks."
+    },
+    {
+      "path": "public/assets/resume/writing-pipeline.png",
+      "prompt": "Create a wide 1536x1024 Excalidraw-style conceptual system architecture diagram for a Chinese developer interview notebook. All labels in large legible English. White background, black sketch lines, soft blue teal and amber highlights, no logos. Title 'Document generation: durable work, live progress'. Top flow 'Browser' -> 'Spring Boot API' -> 'MySQL: task state'. Center flow 'Chapter jobs' -> 'RocketMQ' -> three grouped 'Python workers' boxes -> 'Artifacts / MinIO'. Above workers label 'Redisson lock + renewal'. Line from workers to MySQL labelled 'idempotent state update'. Bottom flow 'Progress event / Redis' -> 'SSE' -> 'Browser'; annotate 'Reconnect: snapshot + event cursor'. Separate bottom inset in pale blue: 'BM25' and 'Vector search' both -> 'RRF' -> 'Reranker' -> 'Citations'. Dashed arrow 'retry' from worker to RocketMQ; note 'A lock is not a global concurrency limit'. Keep arrows unambiguous and spacious. This is a study diagram of mechanisms, not deployment evidence. No tiny text."
+    },
+    {
+      "path": "public/assets/resume/catena-leases.png",
+      "prompt": "Create a wide 1536x1024 Excalidraw-style teaching diagram, white background, rough black sketch outlines, very legible large English lettering, muted blue teal amber and red highlights. Title 'CATENA: stale workers cannot commit'. Upper half two horizontal swimlanes Worker A and Worker B, timeline left to right. Worker A: 'Claim token 7' -> 'Paused' -> 'Late result: token 7' with red X at final item. Worker B starts after pause: 'Lease expired' -> 'Claim token 8' -> 'Commit token 8' with green check. Central box 'PostgreSQL' contains 'Atomic claim: SKIP LOCKED' and 'Commit: match token + active lease'. Arrow from late result to central box labelled 'reject'. Arrow from valid result to central box labelled 'accept'. Bottom independent flow: 'OTel Collector' -> 'Kafka buffer' -> 'ClickHouse'; below Kafka-to-ClickHouse arrow large label 'Write first, commit offset after'. Lower annotation 'Crash after write may replay: deduplicate'. Leave whitespace between top scheduling and bottom trace pipeline. Must depict the new worker and old worker fencing precisely. No logos, no watermark, no decorative elements."
+    }
+  ]
+}

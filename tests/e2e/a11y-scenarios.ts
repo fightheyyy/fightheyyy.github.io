@@ -1,5 +1,7 @@
 // Each entry is exercised by the real-page axe suite. Selectors prove the component is rendered.
 export const a11yScenarios = [
+  { name: 'resume-index', route: '/resume', components: {} },
+  { name: 'resume-article', route: '/resume/04-vibe-writing', components: {} },
   { name: 'about', route: '/about', components: {} },
   { name: 'handbook', route: '/start', components: {} },
   {

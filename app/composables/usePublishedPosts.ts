@@ -1,6 +1,6 @@
-export function usePublishedPosts() {
-  return useAsyncData('published-posts', async () => {
-    const posts = await queryCollection('posts')
+export function usePublishedPosts(collection: 'posts' | 'resume' = 'posts') {
+  return useAsyncData(`published-${collection}`, async () => {
+    const posts = await queryCollection(collection)
       .where('draft', '=', false)
       .select(
         'path',

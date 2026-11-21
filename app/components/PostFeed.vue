@@ -3,10 +3,10 @@ import IconButton from '~/components/ui/IconButton.vue'
 import { Search, X } from '@lucide/vue'
 import { filterPosts, formatDate, orderPosts, type PostSummary } from '~~/shared/editorial'
 const props = withDefaults(
-  defineProps<{ posts: PostSummary[]; initialCount?: number; searchable?: boolean; highlightFirst?: boolean }>(),
-  { initialCount: 10, searchable: true, highlightFirst: true },
+  defineProps<{ posts: PostSummary[]; initialCount?: number; searchable?: boolean; highlightFirst?: boolean; resume?: boolean; initialCategory?: string }>(),
+  { initialCount: 10, searchable: true, highlightFirst: true, resume: false, initialCategory: 'All' },
 )
-const category = ref('All')
+const category = ref(props.initialCategory)
 const search = ref('')
 const searchOpen = ref(false)
 const input = useTemplateRef('searchInput')
@@ -52,7 +52,7 @@ onBeforeUnmount(() => {
 <template>
   <div>
     <div class="feed-toolbar" :class="{ 'search-is-open': searchOpen }">
-      <CategoryFilter v-model="category" />
+      <CategoryFilter v-model="category" :resume="resume" />
       <div v-if="searchable" class="inline-search">
         <button v-if="!searchOpen" aria-label="Search posts" @click="openSearch">
           <span>[S]</span> Search

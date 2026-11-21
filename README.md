@@ -25,6 +25,10 @@ See [migration notes](docs/MIGRATION.md) for the original-blog import workflow. 
 
 Pageview collection and its Cloudflare deployment are described in [analytics setup](docs/analytics.md). Both presentations share one counter; no demo counts are shown.
 
+## Resume notes
+
+`/resume` is an unlisted interview study collection in `content/resume/`. It reuses the editorial feed and reader; the extra category is scoped to this route. It is excluded from public search, RSS, sitemap, and the homepage. `noindex` is a crawler request, not access control. Do not add private resume files or internal company evidence. Illustration prompts: `docs/resume-image-prompts.json`.
+
 ## Publish
 
 Pushes to `main` run the GitHub Pages workflow, which installs dependencies, generates `.output/public/`, and publishes that directory. GitHub Pages must use **GitHub Actions** as its source.

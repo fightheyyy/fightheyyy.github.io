@@ -2,14 +2,17 @@
 import { publicUrl } from '~~/shared/editorial'
 import { formatDate } from '~~/shared/editorial'
 import { site } from '~~/shared/site'
+definePageMeta({ alias: ['/resume/:slug(.*)+'] })
 const route = useRoute()
+const isResume = route.path.startsWith('/resume/')
+const collection = isResume ? 'resume' : 'posts'
 const config = useRuntimeConfig()
 const { data: post } = await useAsyncData(`post:${route.path}`, () =>
-  queryCollection('posts').path(route.path).where('draft', '=', false).first(),
+  queryCollection(collection).path(route.path).where('draft', '=', false).first(),
 )
 if (!post.value)
   throw createError({ statusCode: 404, statusMessage: 'This note has not been written yet.' })
-const { data: posts } = await usePublishedPosts()
+const { data: posts } = await usePublishedPosts(collection)
 const body = useTemplateRef<HTMLElement>('body')
 const { progress, activeId, titleVisible } = useReadingPosition(body)
 const related = computed(() =>
@@ -20,6 +23,7 @@ const related = computed(() =>
 )
 const canonical = publicUrl(route.path, config.public.siteUrl)
 useSeoMeta({
+  robots: isResume ? 'noindex, nofollow' : undefined,
   title: post.value.title,
   description: post.value.description,
   ogTitle: post.value.title,
@@ -53,6 +57,7 @@ useHead({
     <div class="mobile-reading-progress" :style="{ width: `${progress}%` }" aria-hidden="true" />
     <header class="article-hero page-shell">
       <div class="article-hero-content">
+        <p v-if="isResume"><NuxtLink to="/resume">返回 resume 复盘专栏</NuxtLink></p>
         <div class="article-brandline"><ArticleEmblem :key="post.path" :path="post.path" :category="post.category" /><span class="badge">{{
           post.category
         }}</span></div>
@@ -88,8 +93,8 @@ useHead({
       <div ref="body" class="prose"><ContentRenderer :value="post" /></div>
     </div>
     <section class="related-section page-shell" aria-labelledby="related-heading">
-      <h2 id="related-heading" class="section-title">Keep exploring</h2>
-      <PostFeed :posts="related" :searchable="false" :highlight-first="false" :initial-count="5" />
+      <h2 id="related-heading" class="section-title">{{ isResume ? '继续拷打' : 'Keep exploring' }}</h2>
+      <PostFeed :posts="related" :resume="isResume" :searchable="false" :highlight-first="false" :initial-count="5" />
     </section>
   </main>
 </template>
