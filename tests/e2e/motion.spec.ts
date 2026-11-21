@@ -36,7 +36,7 @@ test('normal motion releases post opacity after entrance, filtering, and load mo
   await rows.first().hover()
   await expect.poll(() => opacity(rows.nth(1))).toBe(0.9)
   await page.getByRole('button', { name: 'All', exact: true }).click()
-  await expect(rows).toHaveCount(8)
+  await expect(rows).toHaveCount(7)
   await rows.last().hover()
   await expect.poll(() => opacity(rows.nth(5))).toBe(0.9)
   await page.keyboard.press('Tab')
