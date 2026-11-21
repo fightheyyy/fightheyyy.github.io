@@ -38,7 +38,7 @@ export default defineNuxtConfig({
     head: {
       htmlAttrs: { lang: 'zh-CN', class: 'light' },
       script: [
-        { src: `${baseURL}entry.js?v=dual-view-v3`, tagPriority: 'critical' },
+        { src: `${baseURL}entry.js?v=manual-view-v4`, tagPriority: 'critical' },
         { src: `${baseURL}traffic.js?v=live-v1`, defer: true },
       ],
       link: [

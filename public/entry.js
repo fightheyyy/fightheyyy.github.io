@@ -12,7 +12,7 @@
   const onMinimal = url.pathname === `${root.pathname}classic/` || url.pathname === `${root.pathname}classic/index.html`;
   if (!onEditorial && !onMinimal) return;
 
-  const style = valid(requested) ? requested : Math.random() < .5 ? "minimal" : "editorial";
+  const style = valid(requested) ? requested : onMinimal ? "minimal" : "editorial";
   if (valid(requested)) {
     url.searchParams.delete("view");
     history.replaceState(history.state, "", url.href);
@@ -20,7 +20,7 @@
   if ((style === "minimal" && onEditorial) || (style === "editorial" && onMinimal)) {
     const destination = new URL(style === "minimal" ? "classic/index.html" : "./", root);
     destination.search = url.search;
-    // A one-use hint prevents a second random draw on the destination page.
+    // Keep explicit switches consistent on the destination page.
     destination.searchParams.set("view", style);
     destination.hash = url.hash;
     window.__blogEntryRedirect = true;
