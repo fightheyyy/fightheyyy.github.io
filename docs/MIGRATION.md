@@ -2,7 +2,7 @@
 
 Based on [alexanderop/nuxt-editorial-starter](https://github.com/alexanderop/nuxt-editorial-starter), MIT. The upstream license is retained in `LICENSE`.
 
-The seven articles are in `content/blog/`. Site identity and categories are in `shared/site.ts`; project data is shared through `shared/projects.ts`, ordered by creation date. The original HTML blog and its assets are retained at `public/classic/` and exposed under `/classic/`, with a shared navigation header.
+Published articles are in `content/blog/`. Site identity and categories are in `shared/site.ts`; project data is shared through `shared/projects.ts`, ordered by creation date. The original HTML blog and its assets are retained at `public/classic/` and exposed under `/classic/`, with a shared navigation header.
 
 The header labels the two presentations **Editorial** and **Minimal**. The main homepage always opens Editorial. Opening or refreshing `/classic/` or `/classic/index.html` keeps Minimal. `public/entry.js` only redirects for explicit switches (`?view=editorial` or `?view=minimal`); the hint is removed from the address bar after navigation. No choice is saved, and preferences from the previous version are removed. Direct article and Terminal URLs bypass presentation switching. Without JavaScript, the homepage remains a complete editorial page.
 
@@ -32,7 +32,7 @@ node scripts/import-blog.mjs ../fightheyyy.github.io
 pnpm generate
 ```
 
-Importing replaces the seven generated Markdown files and the `/classic/` copy. Edit either the original HTML via Studio and reimport, or maintain the Markdown directly; reimporting overwrites direct Markdown edits. The import report in `docs/import-report.json` lists migrated headings and images. Custom interactive diagrams remain accessible through each article's original-page link.
+Importing replaces the generated Markdown files and the `/classic/` copy. Edit either the original HTML via Studio and reimport, or maintain the Markdown directly; reimporting overwrites direct Markdown edits. The import report in `docs/import-report.json` lists migrated headings and images. Custom interactive diagrams remain accessible through each article's original-page link.
 
 ## Verification
 

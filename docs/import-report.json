@@ -7,13 +7,6 @@
     "images": 2
   },
   {
-    "slug": "catena-edge-cloud-evolution",
-    "category": "Agents",
-    "title": "Catena：我为什么把 Agent 进化拆成端和云",
-    "headings": 10,
-    "images": 0
-  },
-  {
     "slug": "gauzmem-three-path-memory",
     "category": "Agents",
     "title": "GauzMem：给检索到的记忆补上原文和上下文",
