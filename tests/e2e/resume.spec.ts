@@ -128,3 +128,15 @@ for (const preference of ['fresh', 'light', 'dark'] as const) {
     })
   }
 }
+
+for (const slug of ['', ...slugs]) {
+  test(`GitHub Pages trailing slash hydrates resume ${slug || 'index'}`, async ({ page }) => {
+    expect((await page.goto(`/resume/${slug ? `${slug}/` : ''}`))?.status()).toBe(200)
+    await waitForHydration(page)
+    if (slug) await expect(page.locator('main.article-page')).toBeVisible()
+    else await expect(page.locator('.home-feed .post-row')).toHaveCount(5)
+    await page.reload()
+    await waitForHydration(page)
+    await expect(page.getByRole('heading', { level: 1 })).toBeVisible()
+  })
+}

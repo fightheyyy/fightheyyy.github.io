@@ -2,7 +2,7 @@
 import { publicUrl } from '~~/shared/editorial'
 import { formatDate } from '~~/shared/editorial'
 import { site } from '~~/shared/site'
-definePageMeta({ alias: ['/resume/:slug(.*)+'] })
+definePageMeta({ alias: ['/resume/:slug(.+)+'] })
 const route = useRoute()
 const isResume = route.path.startsWith('/resume/')
 const collection = isResume ? 'resume' : 'posts'
